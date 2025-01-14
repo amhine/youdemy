@@ -1,13 +1,30 @@
+<?php
+require './../classe/connexion.php';
+require './../classe/categorie.php';
+
+// Initialiser la connexion à la base de données
+$db = new Database();
+$connect = $db->getConnection();
+
+// Créer un objet Categorie
+$categorie = new Categorie($connect);
+
+// Récupérer toutes les catégories
+$categories = $categorie->getCategories();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="./output.css" rel="stylesheet">
+    <title>Categories</title>
+    <link rel="stylesheet" href="./../src/input.css">
+    <link rel="stylesheet" href="./../src/output.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-<!-- Navbar -->
+    <!-- Navbar -->
 <nav class="bg-gray-800 text-white mb-3">
     <div class="bg-gray-800 py-4">
         <div class="container mx-auto flex justify-between items-center">
@@ -16,28 +33,35 @@
                     <i class="icon-study mr-2"></i> Youdemy<span class="text-blue-500">.</span>
                 </a>
             </div>
-            <div class="relative">
-                <ul class="flex space-x-8 text-sm font-medium">
-                    <li class="active"><a href="index.html" class="text-white hover:text-blue-500">Home</a></li>
-                    <li><a href="./../visiteur/categorie.php" class="text-white hover:text-blue-500">Categorie</a></li>
-                    <li><a href="courses.php" class="text-white hover:text-blue-500">Courses</a></li>
-                    <li><a href="teacher.php" class="text-white hover:text-blue-500">Teacher</a>
-                        <!-- Dropdown -->
-                        <ul class="absolute left-0 hidden bg-white text-black shadow-lg mt-2 space-y-2 py-2 px-4 rounded group-hover:block">
-                            <li><a href="#" class="block hover:text-blue-500">Web Design</a></li>
-                            <li><a href="#" class="block hover:text-blue-500">eCommerce</a></li>
-                            <li><a href="#" class="block hover:text-blue-500">Branding</a></li>
-                            <li><a href="#" class="block hover:text-blue-500">API</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Login</a></li>
-                </ul>
-            </div>
+           
+            <div id="menu" class="hidden md:flex space-x-4">
+            <a href="index.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
+            <a href="categorier.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
+            <a href="vehicule.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Vehicule</a>
+            <a href="reservation.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
+            <a href="avis.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
+            <a href="login.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Login</a>
+       </div>
         </div>
     </div>
 </nav>
 
-<!-- Footer -->
+
+    <div class="flex flex-wrap justify-center  mt-8 mb-8 gap-10">
+        <?php foreach ($categories as $cat): ?>
+            <a href="theme_details.php?id_theme=<?php echo $cat['id_categorie']; ?>" 
+            class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105 w-1 md:w-1/2 lg:w-1/3">
+                <h3 class="text-lg font-bold text-gray-800 mb-2"><?php echo ($cat['nom_categorie']); ?></h3>
+                <p class="text-sm text-gray-600 mb-4"><?php echo ($cat['description']); ?></p>
+                <div class="mt-auto">
+                    <span class="mt-4 block text-blue-600 font-semibold hover:underline">Voir plus</span>
+                </div>
+            </a>
+        <?php endforeach; ?>
+
+    </div>
+
+    <!-- Footer -->
 <footer id="fh5co-footer" role="contentinfo" class="bg-cover bg-center text-white bg-gray-800">
     <div class="overlay absolute inset-0 opacity-50"></div>
     <div class="container mx-auto  py-12">
@@ -107,7 +131,6 @@
         </div>
     </div>
 </footer>
-
 
 </body>
 </html>
