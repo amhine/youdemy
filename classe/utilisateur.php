@@ -6,28 +6,30 @@ class Utilisateur {
         $this->db = $database;
     }
 
-    public function signup($nom, $email, $pasword, $role_id = 2) {
-       
+    public function signup($nom, $email, $password, $role) {
         $check_email = $this->db->query("SELECT id_user FROM utilisateur WHERE email = '$email'");
         if($check_email->rowCount() > 0) {
             return "Cet email existe déjà";
         }
-
-        if(strlen($pasword) < 6) {
+        if(strlen($password) < 6) {
             return "Le mot de passe doit contenir au moins 6 caractères";
         }
-
-        $password_hash = password_hash($pasword, PASSWORD_DEFAULT);
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
         $date_creation = date('Y-m-d H:i:s');
+    
         try {
             $sql = "INSERT INTO utilisateur (nom_user, email, password, id_role, date_creation) 
-        VALUES ('$nom', '$email', '$password_hash', $role_id, '$date_creation')";
+                    VALUES ('$nom', '$email', '$password_hash', '$role', '$date_creation')";
+            
             $this->db->query($sql);
+    
             return "Inscription réussie";
         } catch(PDOException $e) {
             return "Erreur lors de l'inscription: " . $e->getMessage();
         }
     }
+    
+    
 
     public function connexion($email, $pasword) {
         $sql = "SELECT * FROM utilisateur WHERE email = '$email'";

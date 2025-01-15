@@ -37,10 +37,9 @@ $categories = $categorie->getCategories();
             <div id="menu" class="hidden md:flex space-x-4">
             <a href="index.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
             <a href="categorier.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
-            <a href="vehicule.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Vehicule</a>
-            <a href="reservation.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
-            <a href="avis.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
-            <a href="login.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Login</a>
+            <a href="courses.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
+            <a href="teachers.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
+            <a href="./../authentification/signup.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Login</a>
        </div>
         </div>
     </div>
@@ -49,8 +48,8 @@ $categories = $categorie->getCategories();
 
     <div class="flex flex-wrap justify-center  mt-8 mb-8 gap-10">
         <?php foreach ($categories as $cat): ?>
-            <a href="theme_details.php?id_theme=<?php echo $cat['id_categorie']; ?>" 
-            class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105 w-1 md:w-1/2 lg:w-1/3">
+            <a href="cours_details.php?id_theme=<?php echo $cat['id_categorie']; ?>" 
+                class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105 w-1 md:w-1/2 lg:w-1/3">
                 <h3 class="text-lg font-bold text-gray-800 mb-2"><?php echo ($cat['nom_categorie']); ?></h3>
                 <p class="text-sm text-gray-600 mb-4"><?php echo ($cat['description']); ?></p>
                 <div class="mt-auto">

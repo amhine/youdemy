@@ -1,3 +1,14 @@
+<?php
+
+require './../classe/connexion.php';
+require './../classe/role.php';
+
+$db = new Database();
+$role = new Role($db); 
+$roles = $role->getRole();
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,6 +62,18 @@
                         <input type="password" id="password" name="pasword"  
                             class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-800 focus:border-gray-800 focus:z-10 sm:text-sm">
                         <small class="text-red-500 hidden" id="passwordError">Password must be at least 6 characters long.</small>
+                    </div>
+                    <div class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-800 focus:border-gray-800 focus:z-10 sm:text-sm">
+                    
+                    <select id="role" name="role" required class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm">
+                            <option value="0">Choose your role</option>
+                            <?php foreach ($roles as $role): ?>
+                                <option value="<?php echo($role['nom_role']); ?>">
+                                    <?php echo($role['nom_role']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        
                     </div>
                 </div>
 
