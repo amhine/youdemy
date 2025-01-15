@@ -3,8 +3,8 @@
 require './../classe/connexion.php';
 require './../classe/role.php';
 
-$db = new Database();
-$role = new Role($db); 
+$db = new Connexion();
+$role = new Role("", ""); 
 $roles = $role->getRole();
 
 ?>

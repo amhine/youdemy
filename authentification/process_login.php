@@ -5,9 +5,10 @@ require './../classe/utilisateur.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['pasword'];
-
-    $db = new Database();
+    
+    $db = new Connexion();
     $utilisateur = new Utilisateur($db);
+   
     
     $resultat = $utilisateur->connexion($email, $password);
     

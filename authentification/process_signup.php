@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: signup.php?error=" . urlencode("Veuillez sélectionner un rôle."));
         exit;
     }
-    $db = new Database();
+    $db = new Connexion();
     $utilisateur = new Utilisateur($db);
     $resultat = $utilisateur->signup($nom, $email, $password, $role);
 

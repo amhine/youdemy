@@ -1,9 +1,14 @@
 <?php 
+require_once("Connexion.php");
 class Role {
-    private $db;
+    private $id_role;
+    private $nom_role;
+    private $connect;
 
-    public function __construct(Database $database) {
-        $this->db = $database;
+    public function __construct($id_role, $nom_role) {
+        $this->id_role = $id_role;
+        $this->nom_role=$nom_role;
+        $this->connect = (new Connexion())->getConnection();
     }
 
     public function getRole(){
@@ -11,7 +16,7 @@ class Role {
        
             try {
                 $sql = "SELECT * FROM `role` WHERE nom_role NOT IN ('admin')";
-                $stmt = $this->db->prepare($sql);
+                $stmt = $this->connect->prepare($sql);
                 $stmt->execute();
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
             } catch (PDOException $e) {
