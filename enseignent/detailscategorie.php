@@ -11,16 +11,40 @@ $categories = $categorie->getCategories();
 $coursDocument = new CoursDocument($db, null, null, null, null, null, null, null); 
 $coursVideo = new CoursVideo($db, null, null, null, null, null, null, null); 
 
-$cours = array_merge($coursDocument->getCours(), $coursVideo->getCours());
+if (isset($_GET['id_categorie'])) {
+    $id_categorie = intval($_GET['id_categorie']); 
+    $coursDocument = $coursDocument->getCoursByCategorie($id_categorie); 
+    $coursVideo = $coursVideo->getCoursByCategorie($id_categorie);
+
+    $cours = [];
+    $coursIds = [];
+    foreach ($coursDocument as $cour) {
+        if (!isset($coursIds[$cour['id_cours']])) {
+            $cours[] = $cour;
+            $coursIds[$cour['id_cours']] = true;
+        }
+    }
+    foreach ($coursVideo as $cour) {
+        if (!isset($coursIds[$cour['id_cours']])) {
+            $cours[] = $cour;
+            $coursIds[$cour['id_cours']] = true;
+        }
+    }
+
+    if (empty($cours)) {
+        $message = "Aucun cours trouvé pour cette catégorie.";
+    }
+} else {
+    die("Aucune catégorie sélectionnée.");
+}
 ?>
 
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Categories</title>
+    <title>Document</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
 </head>
 <body>
@@ -51,7 +75,6 @@ $cours = array_merge($coursDocument->getCours(), $coursVideo->getCours());
                 <a href="./../enseignent/courses.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
                 <a href="./../enseignent/teacher.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
                 <a href="./../authentification/signup.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Logout</a>
-               
             </div>
         </div>
     </div>
@@ -62,59 +85,64 @@ $cours = array_merge($coursDocument->getCours(), $coursVideo->getCours());
             <a href="./../enseignent/home.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
             <a href="./../enseignent/categorie.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
             <a href="./../enseignent/courses.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
-            <a  href="./../enseignent/teacher.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
+            <a href="./../enseignent/teacher.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
             <a href="./../authentification/signup.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Logout</a>
         </div>
     </div>
 </nav>
 
-    <!-- Ajouter un cours -->
-    <div class="flex justify-end items-center m-5">
-        <a href="ajoutercours.php" class="pt-1 text-white bg-blue-500 rounded-lg w-56 h-10 text-lg font-bold hover:bg-red-700 transition-colors inline-block text-center">
-            Ajouter Cours
-        </a>
+<div class="reservation-card bg-white border border-gray-300 rounded-lg shadow-lg p-6 hover:shadow-xl transition-transform transform hover:-translate-y-2">
+    <div class="mt-6 text-center mb-5 text-xl font-bold">
+        <a href="./../enseignent/categorie.php" class="text-blue-500 font-semibold hover:underline">Retour aux catégories</a>
     </div>
 
-    
-    <!-- Affichage des catégories et cours -->
-    <div class="flex flex-wrap justify-center gap-6 ">
+    <div class="mt-6">
+        <?php 
+            foreach ($categories as $cat) {
+                if ($cat['id_categorie'] == $id_categorie) {
+                }
+            }
+        ?>
 
         <?php
-        foreach ($categories as $categorie): 
+        if (!empty($cours)) {
         ?>
-            <div class="w-full bg-white shadow-md rounded-lg p-4 mb-8">
-                <h2 class="text-center text-3xl font-bold text-gray-800 mt-4 mb-16"><?php echo $categorie['nom_categorie']; ?></h2>
-                
-                <div class="flex flex-wrap gap-6">
-                    <?php 
-                    $displayedCourses = [];
-                    foreach ($cours as $coursItem): 
-                        if ($coursItem['id_categorie'] == $categorie['id_categorie'] && !in_array($coursItem['id_cours'], $displayedCourses)):
-                            $displayedCourses[] = $coursItem['id_cours'];
-                    ?>
-                        <a href="cours_voir.php?id_cours=<?php echo $coursItem['id_cours']; ?>" class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105 w-1 md:w-1/2 lg:w-1/3">
-                            <h3 class="text-lg font-bold text-gray-800 mb-2"><?php echo $coursItem['nom_cours']; ?></h3>
-                            <p class="text-sm text-gray-600 mb-4"><?php echo $categorie['nom_categorie']; ?></p>
+            <div class="flex flex-wrap gap-6 justify-center"> 
+                <?php 
+                    foreach ($cours as $cour):
+                ?>
+                    <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 p-2"> 
+                        <a href="cours_voir.php?id_cours=<?php echo $cour['id_cours']; ?>" class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105">
+                            <h3 class="text-lg font-bold text-gray-800 mb-2"><?php echo $cour['nom_cours']; ?></h3>
+                            <p class="text-sm text-gray-600 mb-4">
+                                <?php
+                                    foreach ($categories as $cat) {
+                                        if ($cat['id_categorie'] == $cour['id_categorie']) {
+                                            echo $cat['nom_categorie'];
+                                        }
+                                    }
+                                ?>
+                            </p>
                             <button type="submit" class="text-white bg-blue-600 rounded-lg w-56 h-10 text-lg font-bold hover:bg-red-700 transition-colors">
                             Inscrire
                         </button>
                         </a>
-                    <?php 
-                        endif; 
-                    endforeach; 
-                    ?>
-                </div>
+                    </div>
+                <?php
+                    endforeach;
+                ?>
             </div>
-        <?php endforeach; ?>
+        <?php
+        } else {
+            echo "<p>Aucun cours trouvé pour cette catégorie.</p>";
+        }
+        ?>
     </div>
+</div>
 
 
-
-
-
-
-    <!-- Footer -->
-    <footer id="fh5co-footer" role="contentinfo" class="bg-cover bg-center text-white bg-gray-800">
+  <!-- Footer -->
+  <footer id="fh5co-footer" role="contentinfo" class="bg-cover bg-center text-white bg-gray-800">
         <div class="container mx-auto py-12">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
                 <!-- About Education Section -->
@@ -183,14 +211,5 @@ $cours = array_merge($coursDocument->getCours(), $coursVideo->getCours());
         </div>
     </footer>
 
-    <!-- Script for toggling mobile menu -->
-    <script>
-        const menuToggle = document.getElementById('menu-toggle');
-        const mobileMenu = document.getElementById('mobile-menu');
-    
-        menuToggle.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-    </script>
 </body>
 </html>

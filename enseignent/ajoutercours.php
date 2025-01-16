@@ -28,10 +28,7 @@ $categories = $categorie->getCategories();
                         <label class="block text-gray-700 font-semibold mb-2" for="nom_cours">Nom :</label>
                         <input type="text" id="nom_cours" name="nom_cours" class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-800 focus:border-gray-800 focus:z-10 sm:text-sm" required>
                     </div>
-                    <div class="mb-6">
-                        <label class="block text-gray-700 font-semibold mb-2" for="description">Description :</label>
-                        <input class="appearance-none border border-gray-400 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent" id="description" name="description" type="text" placeholder="Description" required>
-                    </div>
+                  
                     <div class="mb-6">
                         <label class="block text-gray-700 font-semibold mb-2" for="type_contenu">Type de cours :</label>
                         <select id="type_contenu" name="type_contenu" class="appearance-none border border-gray-400 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent">

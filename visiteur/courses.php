@@ -1,17 +1,17 @@
 <?php
-
 require './../classe/connexion.php';
+require './../classe/categorie.php';
 require './../classe/cours.php';
 
 $db = new Connexion();
 $connect = $db->getConnection();
 
-// Créez une instance de CoursDocument
-$coursDocument = new CoursDocument($connect, $id_cours, $nom_cours, $date_creation, $id_categorie, $id_user, $statut, $fichier);
+$categorie = new Categorie("", "");
+$categories = $categorie->getCategories();
+$coursDocument = new CoursDocument($db, null, null, null, null, null, null, null); 
+$coursVideo = new CoursVideo($db, null, null, null, null, null, null, null); 
 
-
-// Utilisez la bonne variable pour appeler la méthode getCours()
-// $cours = $coursDocument->getCours();
+$cours = array_merge($coursDocument->getCours(), $coursVideo->getCours());
 ?>
 
 
@@ -72,16 +72,36 @@ $coursDocument = new CoursDocument($connect, $id_cours, $nom_cours, $date_creati
 </nav>
 
 
-<div class="flex flex-wrap justify-center mt-8 mb-8 gap-10">
-        <?php foreach ($cours as $categorie): ?> <!-- Utilisez $cours ici, car vous avez récupéré les cours avec la méthode getCours() -->
-            <a href="cours_details.php?id_theme=<?php echo $categorie['id_categorie']; ?>" 
-                class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105 w-1 md:w-1/2 lg:w-1/3">
-                <h3 class="text-lg font-bold text-gray-800 mb-2"><?php echo $categorie['nom_categorie']; ?></h3>
-                <p class="text-sm text-gray-600 mb-4"><?php echo $categorie['description']; ?></p>
-                <div class="mt-auto">
-                    <span class="mt-4 block text-blue-600 font-semibold hover:underline">Voir plus</span>
+ 
+   <!-- Affichage des catégories et cours -->
+   <div class="flex flex-wrap justify-center gap-6">
+
+        <?php
+        foreach ($categories as $categorie): 
+        ?>
+            <div class="w-full bg-white shadow-md rounded-lg p-4">
+                <h2 class="text-center text-3xl font-bold text-blue-600 mt-4 mb-4"><?php echo $categorie['nom_categorie']; ?></h2>
+                
+                <div class="flex flex-wrap gap-6">
+                    <?php 
+                    $displayedCourses = [];
+                    foreach ($cours as $coursItem): 
+                        if ($coursItem['id_categorie'] == $categorie['id_categorie'] && !in_array($coursItem['id_cours'], $displayedCourses)):
+                            $displayedCourses[] = $coursItem['id_cours'];
+                    ?>
+                        <a href="cours_voir.php?id_cours=<?php echo $coursItem['id_cours']; ?>" class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105 w-1 md:w-1/2 lg:w-1/3">
+                            <h3 class="text-lg font-bold text-gray-800 mb-2"><?php echo $coursItem['nom_cours']; ?></h3>
+                            <p class="text-sm text-gray-600 mb-4"><?php echo $categorie['nom_categorie']; ?></p>
+                            <div class="mt-auto">
+                                <span class="mt-4 block text-blue-600 font-semibold hover:underline">Voir plus</span>
+                            </div>
+                        </a>
+                    <?php 
+                        endif; 
+                    endforeach; 
+                    ?>
                 </div>
-            </a>
+            </div>
         <?php endforeach; ?>
     </div>
 

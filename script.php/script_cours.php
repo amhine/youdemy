@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Sauvegarder le cours
     if ($cours->save()) {
-        echo "Le cours a été ajouté avec succès!";
+        header("Location: ./../enseignent/courses.php");
     } else {
         echo "Erreur lors de l'ajout du cours.";
     }
