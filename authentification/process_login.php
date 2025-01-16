@@ -5,7 +5,7 @@ require './../classe/utilisateur.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['pasword'];
-    
+
     $db = new Connexion();
     $utilisateur = new Utilisateur($db);
    
@@ -15,9 +15,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if($resultat == "Connexion réussie") {
         
         if($_SESSION['id_role'] == 1) { 
-            header("Location: dashbord.php");
-        } else { 
-            header("Location: index.php");
+            header("Location: ./../admin/dashbord.php");
+        } elseif ($_SESSION['id_role'] == 2){
+            header("Location: ./../etudient/home.php");
+
+        }else { 
+            header("Location: ./../enseignent/home.php");
         }
         exit();
     } else {

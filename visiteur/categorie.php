@@ -23,7 +23,7 @@ $categories = $categorie->getCategories();
     <!-- Navbar -->
 
     <!-- Correction de la structure de navigation -->
-<nav class="bg-gray-800 mb-3">
+    <nav class="bg-gray-800 mb-3">
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-16">
             <!-- Logo -->
@@ -46,8 +46,8 @@ $categories = $categorie->getCategories();
             <div class="hidden md:flex md:items-center space-x-4">
                 <a href="index.php" class="text-gray-300 cursor-pointer hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
                 <a href="categorier.php" class="text-gray-300 cursor-pointer hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
-                <a href="vehicule.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
-                <a href="reservation.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
+                <a href="courses.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
+                <a href="teacher.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
                 <a href="./../authentification/signup.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Login</a>
             </div>
         </div>
@@ -58,9 +58,9 @@ $categories = $categorie->getCategories();
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <a href="index.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
             <a href="categorier.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
-            <a href="vehicule.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
-            <a href="reservation.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
-            <a href="avis.php" class="block text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Login</a>
+            <a href="courses.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
+            <a  href="teacher.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
+            <a href="./../authentification/signup.php" class="block text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Login</a>
         </div>
     </div>
 </nav>
@@ -82,7 +82,7 @@ $categories = $categorie->getCategories();
 
     <!-- Footer -->
 <footer id="fh5co-footer" role="contentinfo" class="bg-cover bg-center text-white bg-gray-800">
-    <div class="overlay hidden absolute inset-0 opacity-50"></div>
+    
     <div class="container mx-auto  py-12">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
             <!-- About Education Section -->

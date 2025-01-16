@@ -1,34 +1,13 @@
-<?php
-
-require './../classe/connexion.php';
-require './../classe/cours.php';
-
-$db = new Connexion();
-$connect = $db->getConnection();
-
-// Créez une instance de CoursDocument
-$coursDocument = new CoursDocument($connect, $id_cours, $nom_cours, $date_creation, $id_categorie, $id_user, $statut, $fichier);
-
-
-// Utilisez la bonne variable pour appeler la méthode getCours()
-// $cours = $coursDocument->getCours();
-?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Categories</title>
+    <title>Document</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
-    
-
 </head>
 <body>
-    <!-- Navbar -->
-
-    <!-- Correction de la structure de navigation -->
+<!-- Navbar -->
 <nav class="bg-gray-800 mb-3">
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-16">
@@ -50,11 +29,12 @@ $coursDocument = new CoursDocument($connect, $id_cours, $nom_cours, $date_creati
             
             <!-- Nav Links -->
             <div class="hidden md:flex md:items-center space-x-4">
-                <a href="index.php" class="text-gray-300 cursor-pointer hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
-                <a href="categorier.php" class="text-gray-300 cursor-pointer hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
-                <a href="courses.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
-                <a href="teacher.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
-                <a href="./../authentification/signup.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Login</a>
+                <a href="./../enseignent/home.php" class="text-gray-300 cursor-pointer hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                <a href="./../enseignent/categorie.php" class="text-gray-300 cursor-pointer hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
+                <a href="./../enseignent/courses.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
+                <a href="./../enseignent/teacher.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
+                <a href="./../authentification/signup.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Logout</a>
+               
             </div>
         </div>
     </div>
@@ -62,32 +42,18 @@ $coursDocument = new CoursDocument($connect, $id_cours, $nom_cours, $date_creati
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="hidden md:hidden">
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="index.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
-            <a href="categorier.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
-            <a href="courses.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
-            <a  href="teacher.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
-            <a href="./../authentification/signup.php" class="block text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Login</a>
+            <a href="./../enseignent/home.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
+            <a href="./../enseignent/categorie.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
+            <a href="./../enseignent/courses.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
+            <a  href="./../enseignent/teacher.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
+            <a href="./../authentification/signup.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Logout</a>
         </div>
     </div>
 </nav>
 
-
-<div class="flex flex-wrap justify-center mt-8 mb-8 gap-10">
-        <?php foreach ($cours as $categorie): ?> <!-- Utilisez $cours ici, car vous avez récupéré les cours avec la méthode getCours() -->
-            <a href="cours_details.php?id_theme=<?php echo $categorie['id_categorie']; ?>" 
-                class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105 w-1 md:w-1/2 lg:w-1/3">
-                <h3 class="text-lg font-bold text-gray-800 mb-2"><?php echo $categorie['nom_categorie']; ?></h3>
-                <p class="text-sm text-gray-600 mb-4"><?php echo $categorie['description']; ?></p>
-                <div class="mt-auto">
-                    <span class="mt-4 block text-blue-600 font-semibold hover:underline">Voir plus</span>
-                </div>
-            </a>
-        <?php endforeach; ?>
-    </div>
-
-    <!-- Footer -->
+<!-- Footer -->
 <footer id="fh5co-footer" role="contentinfo" class="bg-cover bg-center text-white bg-gray-800">
-    <div class="overlay hidden absolute inset-0 opacity-50"></div>
+    
     <div class="container mx-auto  py-12">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
             <!-- About Education Section -->
@@ -155,17 +121,7 @@ $coursDocument = new CoursDocument($connect, $id_cours, $nom_cours, $date_creati
         </div>
     </div>
 </footer>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const menuToggle = document.getElementById('menu-toggle');
-        const mobileMenu = document.getElementById('mobile-menu');
-        
-        if (menuToggle && mobileMenu) {
-            menuToggle.addEventListener('click', function() {
-                mobileMenu.classList.toggle('hidden');
-            });
-        }
-    });
-</script>
+
+
 </body>
 </html>
