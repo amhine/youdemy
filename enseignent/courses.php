@@ -1,11 +1,26 @@
 <?php
 require './../classe/connexion.php';
 require './../classe/categorie.php';
+require './../classe/cours.php'; 
 
 $db = new Connexion();
-$categorie = new Categorie("", ""); 
-$categories = $categorie->getCategories();
+$connect = $db->getConnection();
+
+$categorieObj = new Categorie();
+$categories = $categorieObj->getCategories();
+
+$coursDocument = new CoursDocument($db, null, null, null, null, null, null, null, null, null); 
+$coursVideo = new CoursVideo($db, null, null, null, null, null, null, null, null, null);
+
+// Récupérer les cours de type document et vidéo
+$cours = array_merge($coursDocument->getCours(), $coursVideo->getCours());
+
+// Supposons que l'ID de l'utilisateur connecté est stocké dans la session.
+session_start();
+$id_user_connected = $_SESSION['id_user'];  // ID de l'utilisateur connecté
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,8 +28,6 @@ $categories = $categorie->getCategories();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Categories</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
-    
-
 </head>
 <body>
     <!-- Navbar -->
@@ -27,100 +40,85 @@ $categories = $categorie->getCategories();
                         You<span class="text-blue-400">demy</span>
                     </a>
                 </div>
-            
-                <!-- Hamburger Menu (mobile) -->
-                <div class="md:hidden">
-                    <button id="menu-toggle" class="text-gray-300 focus:outline-none focus:text-white">
-                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                        </svg>
-                    </button>
-                </div>
-            
+                
                 <!-- Nav Links -->
-                <div id="menu" class="hidden md:flex space-x-4">
-                    <a href="index.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
-                    <a href="categorier.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
-                    <a href="vehicule.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
-                    <a href="reservation.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
-                    <button>
-                        <a href="./../authentification/signup.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Login</a>
-                    </button>
+                <div class="hidden md:flex md:items-center space-x-4">
+                    <a href="./../enseignent/home.php" class="text-gray-300 cursor-pointer hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a href="./../enseignent/categorie.php" class="text-gray-300 cursor-pointer hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
+                    <a href="./../enseignent/courses.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
+                    <a href="./../enseignent/teacher.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
+                    <a href="./../authentification/signup.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Logout</a>
                 </div>
             </div>
         </div>
-    
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-gray-800">
-            <a href="index.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
-            <a href="categorier.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
-            <a href="vehicule.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
-            <a href="reservation.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
-            <a href="avis.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Login</a>
-        </div>
     </nav>
+
+    <!-- Ajouter un cours -->
     <div class="flex justify-end items-center m-5">
-        <a href="ajoutercours.php" class="text-white bg-blue-600 rounded-lg w-56 h-10 text-lg font-bold hover:bg-red-700 transition-colors inline-block text-center">
+        <a href="ajoutercours.php" class="pt-1 text-white bg-blue-500 rounded-lg w-56 h-10 text-lg font-bold hover:bg-red-700 transition-colors inline-block text-center">
             Ajouter Cours
         </a>
     </div>
-    <!-- Main Content -->
-    <div class="bg-gray-100 flex justify-center items-center min-h-screen m-0">
-        <form action="./../script.php/script_cours.php" method="POST" id="addCategoryForm">
-            <div class="max-w-[800px] w-full bg-white rounded-lg shadow-lg">
-                <div class="px-8 py-4 bg-blue-400 text-white">
-                    <h1 class="flex justify-center font-bold text-white text-3xl">Cours</h1>
-                </div>
-                <div class="px-8 py-6">
-                    <div class="mb-6">
-                        <label class="block text-gray-700 font-semibold mb-2" for="nom_cours">Nom :</label>
-                        <input type="text" id="nom_cours" name="nom_cours" class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-800 focus:border-gray-800 focus:z-10 sm:text-sm" required>
-                    </div>
-                    <div class="mb-6">
-                        <label class="block text-gray-700 font-semibold mb-2" for="description">Description :</label>
-                        <input class="appearance-none border border-gray-400 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent" id="description" name="description" type="text" placeholder="Description" required>
-                    </div>
-                    <div class="mb-6">
-                        <label class="block text-gray-700 font-semibold mb-2" for="type_contenu">Type de cours :</label>
-                        <select id="type_contenu" name="type_contenu" class="appearance-none border border-gray-400 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent">
-                            <option value="0">Choisir le type de cours</option>    
-                            <option value="document">Document</option>
-                            <option value="video">Vidéo</option>
-                        </select>
-                    </div>
-                    <div class="mb-6">
-                        <label class="block text-gray-700 font-semibold mb-2" for="categorie">Les categorie :</label>
-                        <select id="categorie" name="categorie" required class="appearance-none border border-gray-400 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent" >
-                            <option value="0">Choisir la categorie</option>
-                            <?php foreach ($categories  as $categorie ): ?>
-                                <option value="<?php echo($categorie ['nom_categorie']); ?>">
-                                    <?php echo($categorie ['nom_categorie']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label class="block text-gray-700 font-semibold mb-2" for="fichier">Url  vedio ou  document :</label>
-                        <input type="text" id="fichier" name="fichier" class="appearance-none border border-gray-400 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent" required>
-                    </div>
-                    <div class="flex justify-between mt-8">
-                        <a href="courses.php" class="text-white bg-red-600 w-40 rounded-lg py-3 hover:bg-red-800 cursor-pointer flex justify-center">
-                            Cancel
-                        </a>
-                        <button type="submit" class="text-white bg-blue-600 w-40 rounded-lg py-3 hover:bg-blue-800 cursor-pointer">
-                            Add
-                        </button>
-                    </div>
+
+   
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 mt-12">
+    <!-- Affichage des cartes des cours créés par l'utilisateur connecté -->
+    <?php 
+    $affiches = [];
+
+    foreach ($cours as $coursItem): 
+        // Vérifier si le cours est actif et si l'utilisateur connecté est le créateur du cours
+        if ($coursItem->getstatus() == 'Actif' && $coursItem->getUserByCours()['id_user'] == $id_user_connected):
+
+            // Vérifier si le cours a déjà été affiché
+            if (!in_array($coursItem->getIdCours(), $affiches)):
+                $affiches[] = $coursItem->getIdCours();
+    ?>
+        <!-- Nouvelle carte de cours -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl hover:-translate-y-1">
+            <div class="relative">
+                <!-- Image du cours -->
+                <img src="<?= $coursItem->getimage() ?>" alt="Course thumbnail" class="w-full h-48 object-cover">
+                <!-- Catégorie en badge -->
+                <div class="absolute top-4 right-4 bg-purple-600 text-white px-3 py-1 rounded-full text-sm">
+                    <?php echo $coursItem->getCategorie() ? $coursItem->getCategorie()['nom_categorie'] : 'No Category'; ?>
                 </div>
             </div>
-        </form>
-    </div>
+            <div class="p-6">
+                <!-- Nom du cours -->
+                <h3 class="text-xl font-semibold mb-2 text-gray-800"><?php echo $coursItem->getNom(); ?></h3>
+                <!-- Description du cours -->
+                <p class="text-gray-600 mb-4"><?php echo $coursItem->getdescription(); ?> .</p>
+
+                <div class="flex justify-between items-center">
+                    <!-- Lien vers la page du cours -->
+                    <a href="cours_voir.php?id_cours=<?php echo $coursItem->getIdCours(); ?>">
+                        <button class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700">
+                            Read More
+                        </button>
+                    </a>
+
+                    <!-- Bouton d'inscription -->
+                    <a href="../Controller/inscription/inscription.php?id=<?= $coursItem->getIdCours() ?>">
+                        <button class="px-6 py-2 border-2 border-purple-600 text-black font-bold bg-white rounded-full hover:bg-purple-600 hover:text-white hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+                            Join Course
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    <?php 
+            endif;
+        endif; 
+    endforeach; 
+    ?>
+</div>
+
+
 
     <!-- Footer -->
     <footer id="fh5co-footer" role="contentinfo" class="bg-cover bg-center text-white bg-gray-800">
-        
-        <div class="container mx-auto py-12">
+        <div class="container mx-auto  py-12">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
                 <!-- About Education Section -->
                 <div class="fh5co-widget">
@@ -148,7 +146,7 @@ $categories = $categorie->getCategories();
                         <li><a href="#" class="hover:text-blue-500">Privacy</a></li>
                         <li><a href="#" class="hover:text-blue-500">Testimonials</a></li>
                         <li><a href="#" class="hover:text-blue-500">Handbook</a></li>
-                        <li><a href="#" class="hover:text-blue-500">Help Desk</a></li>
+                        <li><a href="#" class="hover:text-blue-500">Held Desk</a></li>
                     </ul>
                 </div>
 
@@ -197,9 +195,5 @@ $categories = $categorie->getCategories();
             mobileMenu.classList.toggle('hidden');
         });
     </script>
-    
-    <!-- TailwindCSS CDN -->
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-
 </body>
 </html>
