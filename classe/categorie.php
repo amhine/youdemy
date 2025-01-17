@@ -1,6 +1,6 @@
+
 <?php
 require_once("Connexion.php");
-
 
 class Categorie {
 
@@ -9,12 +9,31 @@ class Categorie {
     private $description;
     private $connect;
 
-    // Constructeur
-    public function __construct($nom_categorie, $description, $id_categorie = null) {
+    public function __construct($nom_categorie = null, $description = null, $id_categorie = null) {
         $this->id_categorie = $id_categorie;
         $this->nom_categorie = $nom_categorie;
         $this->description = $description;
         $this->connect = (new Connexion())->getConnection();
+    }
+
+    public function getNom() {
+        return $this->nom_categorie;  
+    }
+    
+    public function setNom($nom_categorie) {
+        $this->nom_categorie = $nom_categorie;  
+    }
+
+    public function getDescription() {
+        return $this->description;  
+    }
+    
+    public function setDescription($description) {
+        $this->description = $description;  
+    }
+
+    public function getIdCategorie() {
+        return $this->id_categorie;
     }
 
     public function getCategories() {
@@ -22,12 +41,38 @@ class Categorie {
             $sql = "SELECT * FROM categorie";
             $stmt = $this->connect->prepare($sql);
             $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $categorieObjects = [];
+            foreach ($categories as $categorie) {
+                $categorieObjects[] = new Categorie($categorie['nom_categorie'], $categorie['description'], $categorie['id_categorie']);
+            }
+            return $categorieObjects;
         } catch (PDOException $e) {
             echo "Error retrieving categories: " . $e->getMessage();
             return [];
         }
     }
-}
 
+    public function ajouterCategorie() {
+        try {
+            if ($this->nom_categorie && $this->description) {
+                $sql = "INSERT INTO categorie (nom_categorie, description) VALUES (:nom_categorie, :description)";
+                $stmt = $this->connect->prepare($sql);
+                $stmt->bindParam(':nom_categorie', $this->nom_categorie);
+                $stmt->bindParam(':description', $this->description);
+                $stmt->execute();
+                if ($stmt->rowCount() > 0) {
+                    return "Categorie ajoutée avec succès.";
+                } else {
+                    return "Aucune catégorie ajoutée.";
+                }
+            } else {
+                return "Nom et description sont requis.";
+            }
+        } catch (PDOException $e) {
+            echo "Error adding category: " . $e->getMessage();
+            return "Une erreur est survenue lors de l'ajout de la catégorie.";
+        }
+    }
+}
 ?>

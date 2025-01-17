@@ -4,9 +4,8 @@ require './../classe/categorie.php';
 
 $db = new Connexion();
 $connect = $db->getConnection();
-$categorie = new Categorie("", "");
-
-$categories = $categorie->getCategories();
+$categorieObj = new Categorie();
+$categories = $categorieObj->getCategories(); // Retourne un tableau d'objets Categorie
 ?>
 
 <!DOCTYPE html>
@@ -16,72 +15,46 @@ $categories = $categorie->getCategories();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Categories</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
-    
-
 </head>
 <body>
     <!-- Navbar -->
-
-<!-- Navbar -->
-<nav class="bg-gray-800 mb-3">
-    <div class="container mx-auto px-4">
-        <div class="flex items-center justify-between h-16">
-            <!-- Logo -->
-            <div class="flex-shrink-0">
-                <a href="index.html" class="text-white text-2xl font-bold">
-                    You<span class="text-blue-400">demy</span>
-                </a>
-            </div>
-            
-            <!-- Hamburger Menu (mobile) -->
-            <div class="md:hidden">
-                <button id="menu-toggle" class="text-gray-300 hover:text-white">
-                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                    </svg>
-                </button>
-            </div>
-            
-            <!-- Nav Links -->
-            <div class="hidden md:flex md:items-center space-x-4">
-                <a href="./../enseignent/home.php" class="text-gray-300 cursor-pointer hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
-                <a href="./../enseignent/categorie.php" class="text-gray-300 cursor-pointer hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
-                <a href="./../enseignent/courses.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
-                <a href="./../enseignent/teacher.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
-                <a href="./../authentification/signup.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Logout</a>
-               
-            </div>
-        </div>
-    </div>
-
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden">
-        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="./../enseignent/home.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
-            <a href="./../enseignent/categorie.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
-            <a href="./../enseignent/courses.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
-            <a  href="./../enseignent/teacher.php" class="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
-            <a href="./../authentification/signup.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Logout</a>
-        </div>
-    </div>
-</nav>
-
-
-    <div class="flex flex-wrap justify-center  mt-8 mb-8 gap-10">
-        <?php foreach ($categories as $categorie): ?>
-            <a href="detailscategorie.php?id_categorie=<?php echo $categorie['id_categorie']; ?>" 
-                class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105 w-1 md:w-1/2 lg:w-1/3">
-                <h3 class="text-lg font-bold text-gray-800 mb-2"><?php echo ($categorie['nom_categorie']); ?></h3>
-                <p class="text-sm text-gray-600 mb-4"><?php echo ($categorie['description']); ?></p>
-                <div class="mt-auto">
-                    <span class="mt-4 block text-blue-600 font-semibold hover:underline">Voir plus</span>
+    <nav class="bg-gray-800 mb-3">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="index.html" class="text-white text-2xl font-bold">
+                        You<span class="text-blue-400">demy</span>
+                    </a>
                 </div>
-            </a>
-        <?php endforeach; ?>
+                
+                <!-- Nav Links -->
+                <div class="hidden md:flex md:items-center space-x-4">
+                    <a href="./../enseignent/home.php" class="text-gray-300 cursor-pointer hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a href="./../enseignent/categorie.php" class="text-gray-300 cursor-pointer hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
+                    <a href="./../enseignent/courses.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
+                    <a href="./../enseignent/teacher.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
+                    <a href="./../authentification/signup.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    </div>
+    <div class="flex flex-wrap justify-center mt-8 mb-8 gap-10">
+    <?php foreach ($categories as $categorie): ?>
+        <a href="detailscategorie.php?id_categorie=<?php echo $categorie->getIdCategorie(); ?>" 
+            class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105 w-1 md:w-1/2 lg:w-1/3">
+            <h3 class="text-lg font-bold text-gray-800 mb-2"><?php echo $categorie->getNom(); ?></h3>
+            <p class="text-sm text-gray-600 mb-4"><?php echo $categorie->getDescription(); ?></p>
+            <div class="mt-auto">
+                <span class="mt-4 block text-blue-600 font-semibold hover:underline">Voir plus</span>
+            </div>
+        </a>
+    <?php endforeach; ?>
+</div>
 
-    <!-- Footer -->
+
+   <!-- Footer -->
 <footer id="fh5co-footer" role="contentinfo" class="bg-cover bg-center text-white bg-gray-800">
     
     <div class="container mx-auto  py-12">
@@ -151,17 +124,18 @@ $categories = $categorie->getCategories();
         </div>
     </div>
 </footer>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const menuToggle = document.getElementById('menu-toggle');
-        const mobileMenu = document.getElementById('mobile-menu');
-        
-        if (menuToggle && mobileMenu) {
-            menuToggle.addEventListener('click', function() {
-                mobileMenu.classList.toggle('hidden');
-            });
-        }
-    });
-</script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (menuToggle && mobileMenu) {
+                menuToggle.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
