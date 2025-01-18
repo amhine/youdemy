@@ -53,10 +53,21 @@ $categories = $categorie->getCategories();
                         <?php endforeach; ?>
                     </select>
                 </div>
+                
+                
                 <div class="mb-6">
                     <label class="block text-gray-700 font-semibold mb-2" for="fichier">URL vidéo ou document :</label>
                     <input type="text" id="fichier" name="fichier" class="appearance-none border border-gray-400 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent" required>
                 </div>
+                <div class="mb-6">
+                <div id="tags-container">
+                        <label class="block text-gray-700 font-semibold mb-2" for="nom_tag[]">Tags :</label>
+                        <input type="text" id="nom_tag" name="nom_tag[]" placeholder="Entrez un tag"  class="appearance-none border border-gray-400 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"  required>
+                </div>
+                    <button type="button" onclick="ajouterTag()" class="text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-800 mt-4">
+                        Ajouter un autre tag
+                    </button>
+                    </div>
                 <div class="flex justify-between mt-8">
                     <a href="courses.php" class="text-white bg-red-600 w-40 rounded-lg py-3 hover:bg-red-800 cursor-pointer flex justify-center">
                         Annuler
@@ -67,7 +78,46 @@ $categories = $categorie->getCategories();
                 </div>
             </div>
         </div>
+        
     </form>
+    
 </div>
+<script>
+        // Fonction pour ajouter un nouvel input tag
+      // Fonction pour ajouter un nouvel input tag
+      function ajouterTag() {
+    var container = document.getElementById("tags-container");
+    var newInput = document.createElement("input");
+    newInput.type = "text";
+    newInput.name = "nom_tag[]";  // Utilisez le même nom que le premier champ
+    newInput.placeholder = "Entrez un tag";
+    newInput.classList.add("appearance-none", "border", "border-gray-400", "rounded-lg", "w-full", "py-3", "px-4", "text-gray-700", "leading-tight", "focus:outline-none", "focus:ring-2", "focus:ring-blue-400", "focus:border-transparent", "mt-3");
+    container.appendChild(newInput);
+}
+
+
+        // Fonction de validation avant l'envoi du formulaire
+        function validateForm() {
+            var inputs = document.querySelectorAll("input[name='nom_tag[]']");
+            var isValid = true;
+            
+            // Vérifier si tous les champs de tags sont remplis
+            inputs.forEach(function(input) {
+                if (input.value.trim() === "") {
+                    input.classList.add("border-red-500");  // Ajouter une bordure rouge pour indiquer l'erreur
+                    isValid = false;
+                } else {
+                    input.classList.remove("border-red-500");
+                }
+            });
+
+            if (!isValid) {
+                alert("Veuillez remplir tous les champs de tags.");
+            }
+
+            return isValid;
+        }
+</script>
 </body>
+
 </html>

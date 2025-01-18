@@ -2,6 +2,7 @@
 require './../classe/connexion.php';
 require './../classe/categorie.php';
 require './../classe/cours.php'; 
+require './../classe/tag.php';
 
 $db = new Connexion();
 $connect = $db->getConnection();
@@ -11,43 +12,44 @@ $categories = $categorieObj->getCategories();
 
 $coursDocument = new CoursDocument($db, null, null, null, null, null, null, null, null, null); 
 $coursVideo = new CoursVideo($db, null, null, null, null, null, null, null, null, null);
-
-// Récupérer les cours de type document et vidéo
 $cours = array_merge($coursDocument->getCours(), $coursVideo->getCours());
 
-// Supposons que l'ID de l'utilisateur connecté est stocké dans la session.
 session_start();
-$id_user_connected = $_SESSION['id_user'];  // ID de l'utilisateur connecté
+if (!isset($_SESSION['id_user'])) {
+    header("Location: ./../authentification/login.php"); 
+    exit; 
+}
+$id_user_connected = $_SESSION['id_user']; 
 
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Categories</title>
+    <title>Document</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="bg-gray-800 mb-3">
+<!-- Navbar -->
+    <nav class="bg-white mb-8   rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl hover:-translate-y-1">
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
                 <div class="flex-shrink-0">
-                    <a href="index.html" class="text-white text-2xl font-bold">
-                        You<span class="text-blue-400">demy</span>
-                    </a>
+                <img src="https://frontends.udemycdn.com/frontends-homepage/staticx/udemy/images/v7/logo-udemy.svg" alt="Udemy" width="75" height="28" loading="lazy" style="vertical-align: middle;">
                 </div>
                 
                 <!-- Nav Links -->
                 <div class="hidden md:flex md:items-center space-x-4">
-                    <a href="./../enseignent/home.php" class="text-gray-300 cursor-pointer hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
-                    <a href="./../enseignent/categorie.php" class="text-gray-300 cursor-pointer hover:text-white px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
-                    <a href="./../enseignent/courses.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Courses</a>
-                    <a href="./../enseignent/teacher.php" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
-                    <a href="./../authentification/signup.php" class="text-white hover:text-blue-500 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700">Logout</a>
+                    <a href="./../enseignent/home.php" class="text-gray-800 cursor-pointer hover:purple-800 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a href="./../enseignent/categorie.php" class="text-gray-600 cursor-pointer hover:purple-800 px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
+                    <a href="./../enseignent/courses.php" class="text-gray-600 hover:text-purple-800 px-3 py-2 rounded-md text-sm font-medium">Courses</a>
+                    <a href="./../enseignent/teacher.php" class="text-gray-600 hover:text-purple-800 px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
+                    <a href="./../authentification/login.php" class="text-white hover:text-purple-500 px-4 py-2 rounded bg-purple-600 hover:bg-purple-700">Logout</a>
                 </div>
             </div>
         </div>
@@ -55,7 +57,7 @@ $id_user_connected = $_SESSION['id_user'];  // ID de l'utilisateur connecté
 
     <!-- Ajouter un cours -->
     <div class="flex justify-end items-center m-5">
-        <a href="ajoutercours.php" class="pt-1 text-white bg-blue-500 rounded-lg w-56 h-10 text-lg font-bold hover:bg-red-700 transition-colors inline-block text-center">
+        <a href="ajoutercours.php" class="pt-1 text-white bg-purple-600 rounded-lg w-56 h-10 text-lg font-bold hover:bg-purple-700 transition-colors inline-block text-center">
             Ajouter Cours
         </a>
     </div>
@@ -89,6 +91,20 @@ $id_user_connected = $_SESSION['id_user'];  // ID de l'utilisateur connecté
                 <h3 class="text-xl font-semibold mb-2 text-gray-800"><?php echo $coursItem->getNom(); ?></h3>
                 <!-- Description du cours -->
                 <p class="text-gray-600 mb-4"><?php echo $coursItem->getdescription(); ?> .</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <?php
+                    $tag=new Tag($db, null, null);
+                    $tags = $tag->getTagsByCours($coursItem->getIdCours());
+                     ?>
+                <p class="text-sm text-gray-600 mb-4">Tags : 
+                            <?php 
+                            
+                            foreach ($tags as $tag) { ?>
+                                <span class="px-3 py-1 bg-purple-600 text-white rounded-full text-sm">#<?= $tag->getNomTag() ?></span>
+
+                            <?php } ?>
+                </p>
+                        </div>
 
                 <div class="flex justify-between items-center">
                     <!-- Lien vers la page du cours -->
@@ -117,13 +133,13 @@ $id_user_connected = $_SESSION['id_user'];  // ID de l'utilisateur connecté
 
 
     <!-- Footer -->
-    <footer id="fh5co-footer" role="contentinfo" class="bg-cover bg-center text-white bg-gray-800">
+    <footer id="fh5co-footer" role="contentinfo" class="bg-cover bg-center text-white bg-purple-700">
         <div class="container mx-auto  py-12">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
                 <!-- About Education Section -->
                 <div class="fh5co-widget">
-                    <h3 class="text-xl font-semibold">About Education</h3>
-                    <p class="mt-2 text-sm">Facilis ipsum reprehenderit nemo molestias. Aut cum mollitia reprehenderit. Eos cumque dicta adipisci architecto culpa amet.</p>
+                    <h3 class="text-xl font-semibold  ">About Education</h3>
+                    <p class="mt-2 text-sm ">Facilis ipsum reprehenderit nemo molestias. Aut cum mollitia reprehenderit. Eos cumque dicta adipisci architecto culpa amet.</p>
                 </div>
 
                 <!-- Learning Section -->
