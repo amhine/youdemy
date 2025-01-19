@@ -9,6 +9,8 @@ class Utilisateur {
     protected $id_role;
     protected $date_creation;
     protected $connect;
+    protected $id_cours;
+    protected $date_inscription;
 
     public function __construct($id_user = null, $nom_user = null, $email = null, $password = null, $id_role = null, $date_creation = null) {
         $this->id_user = $id_user;
@@ -85,6 +87,13 @@ class Utilisateur {
 
 class Etudiant extends Utilisateur {
 
+    protected $connect;
+
+    public function __construct($db, $id_user, $nom, $prenom, $email, $mot_de_passe, $role, $date_inscription, $id_cours) {
+        parent::__construct($db, $id_user, $nom, $prenom, $email, $mot_de_passe, $role, $date_inscription);
+        $this->connect = $db->getConnection();
+    }
+
     public function voirCours() {
         $stmt = $this->connect->prepare("SELECT c.titre FROM cours c 
                                          INNER JOIN inscriptions i ON c.id_cours = i.id_cours
@@ -92,15 +101,38 @@ class Etudiant extends Utilisateur {
         $stmt->execute([$this->id_user]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
     public function getDetails() {
         $details = parent::getDetails();
         $details['role'] = 'Étudiant';
         return $details;
     }
+
+    public function inscrireAuCours($id_user, $id_cours) {
+        try {
+            $sql = "INSERT INTO inscription (id_user, id_cours) VALUES (:id_user, :id_cours)";
+            $stmt = $this->connect->prepare($sql);
+            $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+            $stmt->bindParam(':id_cours', $id_cours, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("Erreur lors de l'inscription : " . $e->getMessage());
+            return false;
+        }
+    }
+    public function estInscrit($id_etudiant, $id_cours) {
+        $sql = "SELECT COUNT(*) FROM inscription WHERE id_user = :id_etudiant AND id_cours = :id_cours";
+        $stmt = $this->connect->prepare($sql);
+        $stmt->bindParam(':id_etudiant', $id_etudiant, PDO::PARAM_INT);
+        $stmt->bindParam(':id_cours', $id_cours, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchColumn() > 0;
+    }
 }
 
-
 class Enseignant extends Utilisateur {
+    
     public function ajouterCours($titre, $description) {
         $stmt = $this->connect->prepare("INSERT INTO cours (titre, description, id_enseignant) 
                                          VALUES (?, ?, ?)");

@@ -12,7 +12,7 @@ abstract class Cours {
     protected $images;
     protected $description;
     
-    public function __construct($db, $id_cours, $nom_cours, $date_creation, $id_categorie, $id_user, $statut, $fichier, $type_contenu, $images, $description) {
+    public function __construct($conn, $id_cours, $nom_cours, $date_creation, $id_categorie, $id_user, $statut, $fichier, $type_contenu, $images, $description) {
         $this->id_cours = $id_cours;
         $this->nom_cours = $nom_cours;
         $this->date_creation = $date_creation;
@@ -62,9 +62,7 @@ abstract class Cours {
         $this->statut = $statut;
     }
 
-    public function getfichier() {
-        return $this->fichier;
-    }
+    abstract public function getfichier();
 
     public function setfichier($fichier) {
         $this->fichier = $fichier;
@@ -135,7 +133,7 @@ abstract class Cours {
             $stmt->bindParam(':description', $this->description);
             
             if ($stmt->execute()) {
-                $this->id_cours = $this->conn->lastInsertId(); // Stocke l'ID généré
+                $this->id_cours = $this->conn->lastInsertId(); 
                 return true;
             }
             return false;
@@ -246,6 +244,51 @@ abstract class Cours {
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             return $result['total'];
         }
+   
+
+
+public static function getCoursById($pdo, $id_cours) {
+    $sql = "SELECT * FROM cours WHERE id_cours = :id_cours";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id_cours', $id_cours, PDO::PARAM_INT);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result) {
+        // Vérifier le type de contenu
+        if ($result['type_contenu'] === 'document') {
+            return new CoursDocument(
+                $pdo, // Passer la connexion ici
+                $result['id_cours'], 
+                $result['nom_cours'], 
+                $result['date_creation'], 
+                $result['id_categorie'], 
+                $result['id_user'], 
+                $result['statut'], 
+                $result['fichier'],
+                $result['images'],
+                $result['description']
+            );
+        } elseif ($result['type_contenu'] === 'video') {
+            return new CoursVideo(
+                $pdo, // Passer la connexion ici
+                $result['id_cours'], 
+                $result['nom_cours'], 
+                $result['date_creation'], 
+                $result['id_categorie'], 
+                $result['id_user'], 
+                $result['statut'], 
+                $result['fichier'],
+                $result['images'],
+                $result['description']
+            );
+        }
+    }
+    return null;
+}
+
+
+
 }
 class CoursDocument extends Cours {
     public function __construct($db, $id_cours, $nom_cours, $date_creation, $id_categorie, $id_user, $statut, $fichier, $images, $description) {
@@ -279,6 +322,12 @@ class CoursDocument extends Cours {
         }
         return $cours;
     }
+    public function getfichier() {
+        echo "<iframe src='" . $this->fichier . "' width='900' height='700'></iframe>";
+
+    }
+    
+
 }
 
 class CoursVideo extends Cours {
@@ -313,9 +362,23 @@ class CoursVideo extends Cours {
         }
         return $cours;
     }
+    public function getfichier() {
+        echo "<iframe width='900' height='500' src='" . $this->fichier . "' title='YouTube video player' frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' referrerpolicy='strict-origin-when-cross-origin' allowfullscreen></iframe>";
+    }
+    
 
   
  
     
 }
 ?>
+
+
+
+
+
+
+
+
+
+

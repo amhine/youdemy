@@ -21,11 +21,16 @@ $cours = array_merge(
     $coursDocument->getCoursPaginated($limit, $offset, $search),
     $coursVideo->getCoursPaginated($limit, $offset, $search)
 );
+$uniqueCours = [];
+foreach ($cours as $coursItem) {
+    $uniqueCours[$coursItem->getIdCours()] = $coursItem; 
+}
 
-$totalCours = $coursDocument->countCours($search) + $coursVideo->countCours($search);
+$cours = array_values($uniqueCours);
+
+$totalCours = $coursDocument->countCours($search ) + $coursVideo->countCours($search);
 $totalPages = ceil($totalCours / $limit);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>

@@ -8,12 +8,12 @@
 </head>
 <body>
 <!-- Navbar -->
-<nav class="bg-white mb-8   rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl hover:-translate-y-1">
+<nav class="bg-white mb-8 rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl hover:-translate-y-1">
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
                 <div class="flex-shrink-0">
-                <img src="https://frontends.udemycdn.com/frontends-homepage/staticx/udemy/images/v7/logo-udemy.svg" alt="Udemy" width="75" height="28" loading="lazy" style="vertical-align: middle;">
+                    <img src="https://frontends.udemycdn.com/frontends-homepage/staticx/udemy/images/v7/logo-udemy.svg" alt="Udemy" width="75" height="28" loading="lazy" style="vertical-align: middle;">
                 </div>
                 
                 <!-- Nav Links -->
@@ -21,15 +21,15 @@
                     <a href="./../etudient/home.php" class="text-gray-800 cursor-pointer hover:purple-800 px-3 py-2 rounded-md text-sm font-medium">Home</a>
                     <a href="./../etudient/categorie.php" class="text-gray-600 cursor-pointer hover:purple-800 px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
                     <a href="./../etudient/courses.php" class="text-gray-600 hover:text-purple-800 px-3 py-2 rounded-md text-sm font-medium">Courses</a>
-                    <a href="./../etudient/teacher.php" class="text-gray-600 hover:text-purple-800 px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
-                    <a href="./../authentification/signup.php" class="text-white hover:text-purple-500 px-4 py-2 rounded bg-purple-600 hover:bg-purple-700">Login</a>
+                    <a href="./../etudient/mescours.php" class="text-gray-600 hover:text-purple-800 px-3 py-2 rounded-md text-sm font-medium">Mes Cours</a>
+                    <a href="./../authentification/login.php" class="text-white hover:text-purple-500 px-4 py-2 rounded bg-purple-600 hover:bg-purple-700">Logout</a>
                 </div>
             </div>
         </div>
     </nav>
 
 <!-- Footer -->
-<footer id="fh5co-footer" role="contentinfo" class="bg-cover bg-center text-white bg-purple-700">
+    <footer id="fh5co-footer" role="contentinfo" class="bg-cover bg-center text-white bg-purple-700">
         <div class="container mx-auto  py-12">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
                 <!-- About Education Section -->
