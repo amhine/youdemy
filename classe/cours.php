@@ -12,7 +12,7 @@ abstract class Cours {
     protected $images;
     protected $description;
     
-    public function __construct($db, $id_cours, $nom_cours, $date_creation, $id_categorie, $id_user, $statut, $fichier, $type_contenu, $images, $description) {
+    public function __construct($conn, $id_cours, $nom_cours, $date_creation, $id_categorie, $id_user, $statut, $fichier, $type_contenu, $images, $description) {
         $this->id_cours = $id_cours;
         $this->nom_cours = $nom_cours;
         $this->date_creation = $date_creation;
@@ -62,9 +62,7 @@ abstract class Cours {
         $this->statut = $statut;
     }
 
-    public function getfichier() {
-        return $this->fichier;
-    }
+    abstract public function getfichier();
 
     public function setfichier($fichier) {
         $this->fichier = $fichier;
@@ -119,20 +117,30 @@ abstract class Cours {
     }
 
     public function save() {
-        $query = "INSERT INTO cours (nom_cours, date_creation, id_categorie, id_user, statut, type_contenu, fichier, images, description)
-                  VALUES (:nom_cours, :date_creation, :id_categorie, :id_user, :statut, :type_contenu, :fichier, :images, :description)";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':nom_cours', $this->nom_cours);
-        $stmt->bindParam(':date_creation', $this->date_creation);
-        $stmt->bindParam(':id_categorie', $this->id_categorie);
-        $stmt->bindParam(':id_user', $this->id_user);
-        $stmt->bindParam(':statut', $this->statut);
-        $stmt->bindParam(':type_contenu', $this->type_contenu);
-        $stmt->bindParam(':fichier', $this->fichier);
-        $stmt->bindParam(':images', $this->images);
-        $stmt->bindParam(':description', $this->description);
-
-        return $stmt->execute();
+        try {
+            $query = "INSERT INTO cours (nom_cours, date_creation, id_categorie, id_user, statut, type_contenu, fichier, images, description)
+                      VALUES (:nom_cours, :date_creation, :id_categorie, :id_user, :statut, :type_contenu, :fichier, :images, :description)";
+            
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':nom_cours', $this->nom_cours);
+            $stmt->bindParam(':date_creation', $this->date_creation);
+            $stmt->bindParam(':id_categorie', $this->id_categorie);
+            $stmt->bindParam(':id_user', $this->id_user);
+            $stmt->bindParam(':statut', $this->statut);
+            $stmt->bindParam(':type_contenu', $this->type_contenu);
+            $stmt->bindParam(':fichier', $this->fichier);
+            $stmt->bindParam(':images', $this->images);
+            $stmt->bindParam(':description', $this->description);
+            
+            if ($stmt->execute()) {
+                $this->id_cours = $this->conn->lastInsertId(); 
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la sauvegarde du cours : " . $e->getMessage());
+            return false;
+        }
     }
 
     public function getCours() {
@@ -171,6 +179,116 @@ abstract class Cours {
         }
         return $cours;
     }
+    public function getCoursPaginated($limit = 9, $offset = 0, $search = '') {
+        $query = "SELECT * FROM cours WHERE statut = 'Actif'";
+        if (!empty($search)) {
+            $query .= " AND nom_cours LIKE :search";
+        }
+        $query .= " LIMIT :limit OFFSET :offset";
+    
+        $stmt = $this->conn->prepare($query);
+        if (!empty($search)) {
+            $searchTerm = "%$search%";
+            $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
+        }
+        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+    
+        $cours = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            if ($row['type_contenu'] == 'document') {
+                $cours[] = new CoursDocument(
+                    $this->conn, 
+                    $row['id_cours'], 
+                    $row['nom_cours'], 
+                    $row['date_creation'], 
+                    $row['id_categorie'], 
+                    $row['id_user'], 
+                    $row['statut'], 
+                    $row['fichier'],
+                    $row['images'],
+                    $row['description']
+                );
+            } elseif ($row['type_contenu'] == 'video') {
+                $cours[] = new CoursVideo(
+                    $this->conn, 
+                    $row['id_cours'], 
+                    $row['nom_cours'], 
+                    $row['date_creation'], 
+                    $row['id_categorie'], 
+                    $row['id_user'], 
+                    $row['statut'], 
+                    $row['fichier'],
+                    $row['images'],
+                    $row['description']
+                );
+            }
+        }
+    
+        return $cours;
+    }
+        public function countCours($search = '') {
+            $query = "SELECT COUNT(*) as total FROM cours WHERE statut = 'Actif'";
+            if (!empty($search)) {
+                $query .= " AND nom_cours LIKE :search";
+            }
+    
+            $stmt = $this->conn->prepare($query);
+            if (!empty($search)) {
+                $searchTerm = "%$search%";
+                $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
+            }
+            $stmt->execute();
+    
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['total'];
+        }
+   
+
+
+public static function getCoursById($pdo, $id_cours) {
+    $sql = "SELECT * FROM cours WHERE id_cours = :id_cours";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id_cours', $id_cours, PDO::PARAM_INT);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result) {
+        // Vérifier le type de contenu
+        if ($result['type_contenu'] === 'document') {
+            return new CoursDocument(
+                $pdo, // Passer la connexion ici
+                $result['id_cours'], 
+                $result['nom_cours'], 
+                $result['date_creation'], 
+                $result['id_categorie'], 
+                $result['id_user'], 
+                $result['statut'], 
+                $result['fichier'],
+                $result['images'],
+                $result['description']
+            );
+        } elseif ($result['type_contenu'] === 'video') {
+            return new CoursVideo(
+                $pdo, // Passer la connexion ici
+                $result['id_cours'], 
+                $result['nom_cours'], 
+                $result['date_creation'], 
+                $result['id_categorie'], 
+                $result['id_user'], 
+                $result['statut'], 
+                $result['fichier'],
+                $result['images'],
+                $result['description']
+            );
+        }
+    }
+    return null;
+}
+
+
+
 }
 class CoursDocument extends Cours {
     public function __construct($db, $id_cours, $nom_cours, $date_creation, $id_categorie, $id_user, $statut, $fichier, $images, $description) {
@@ -204,6 +322,12 @@ class CoursDocument extends Cours {
         }
         return $cours;
     }
+    public function getfichier() {
+        echo "<iframe src='" . $this->fichier . "' width='900' height='700'></iframe>";
+
+    }
+    
+
 }
 
 class CoursVideo extends Cours {
@@ -238,5 +362,23 @@ class CoursVideo extends Cours {
         }
         return $cours;
     }
+    public function getfichier() {
+        echo "<iframe width='900' height='500' src='" . $this->fichier . "' title='YouTube video player' frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' referrerpolicy='strict-origin-when-cross-origin' allowfullscreen></iframe>";
+    }
+    
+
+  
+ 
+    
 }
 ?>
+
+
+
+
+
+
+
+
+
+
