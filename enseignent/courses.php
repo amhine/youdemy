@@ -69,10 +69,8 @@ $id_user_connected = $_SESSION['id_user'];
     $affiches = [];
 
     foreach ($cours as $coursItem): 
-        // Vérifier si le cours est actif et si l'utilisateur connecté est le créateur du cours
         if ($coursItem->getstatus() == 'Actif' && $coursItem->getUserByCours()['id_user'] == $id_user_connected):
 
-            // Vérifier si le cours a déjà été affiché
             if (!in_array($coursItem->getIdCours(), $affiches)):
                 $affiches[] = $coursItem->getIdCours();
     ?>
@@ -108,16 +106,16 @@ $id_user_connected = $_SESSION['id_user'];
 
                 <div class="flex justify-between items-center">
                     <!-- Lien vers la page du cours -->
-                    <a href="cours_voir.php?id_cours=<?php echo $coursItem->getIdCours(); ?>">
+                    <a href="modifiercours.php?id_cours=<?php echo $coursItem->getIdCours(); ?>">
                         <button class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700">
-                            Read More
+                            Modifier
                         </button>
                     </a>
 
                     <!-- Bouton d'inscription -->
-                    <a href="../Controller/inscription/inscription.php?id=<?= $coursItem->getIdCours() ?>">
+                    <a href="supprimer.php?id_cours=<?= $coursItem->getIdCours() ?>">
                         <button class="px-6 py-2 border-2 border-purple-600 text-black font-bold bg-white rounded-full hover:bg-purple-600 hover:text-white hover:shadow-lg transform hover:scale-105 transition-all duration-300">
-                            Join Course
+                            Supprimer
                         </button>
                     </a>
                 </div>

@@ -29,7 +29,9 @@ abstract class Cours {
     public function getIdCours() {
         return $this->id_cours;
     }
-
+    public function setIdCours($id_cours) {
+        $this->id_cours=$id_cours;
+    }
     public function getNom() {
         return $this->nom_cours;  
     }
@@ -94,6 +96,9 @@ abstract class Cours {
 
     public function getCategorie() {
         return $this->getCategorieById($this->id_categorie);
+    }
+    public function setCategorie($id_categorie) {
+        $this->id_categorie = $id_categorie;
     }
 
     public function getCategorieById($id_categorie) {
@@ -255,10 +260,9 @@ public static function getCoursById($pdo, $id_cours) {
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($result) {
-        // Vérifier le type de contenu
         if ($result['type_contenu'] === 'document') {
             return new CoursDocument(
-                $pdo, // Passer la connexion ici
+                $pdo, 
                 $result['id_cours'], 
                 $result['nom_cours'], 
                 $result['date_creation'], 
@@ -271,7 +275,7 @@ public static function getCoursById($pdo, $id_cours) {
             );
         } elseif ($result['type_contenu'] === 'video') {
             return new CoursVideo(
-                $pdo, // Passer la connexion ici
+                $pdo, 
                 $result['id_cours'], 
                 $result['nom_cours'], 
                 $result['date_creation'], 
@@ -286,9 +290,47 @@ public static function getCoursById($pdo, $id_cours) {
     }
     return null;
 }
-
-  
-
+public function deletecours($id_cours) {
+    $query = "DELETE FROM `cours` WHERE id_cours = $id_cours";
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+}
+public function modifier() {
+    try {
+        $query = "UPDATE cours 
+                  SET nom_cours = :nom_cours, 
+                      date_creation = :date_creation, 
+                      id_categorie = :id_categorie, 
+                      id_user = :id_user, 
+                      statut = :statut, 
+                      type_contenu = :type_contenu, 
+                      fichier = :fichier, 
+                      images = :images, 
+                      description = :description
+                  WHERE id_cours = :id_cours";
+        $stmt = $this->conn->prepare($query);
+        
+        $stmt->bindParam(':nom_cours', $this->nom_cours);
+        $stmt->bindParam(':date_creation', $this->date_creation);
+        $stmt->bindParam(':id_categorie', $this->id_categorie);
+        $stmt->bindParam(':id_user', $this->id_user);
+        $stmt->bindParam(':statut', $this->statut);
+        $stmt->bindParam(':type_contenu', $this->type_contenu);
+        $stmt->bindParam(':fichier', $this->fichier);
+        $stmt->bindParam(':images', $this->images);
+        $stmt->bindParam(':description', $this->description);
+        $stmt->bindParam(':id_cours', $this->id_cours);
+        
+        if ($stmt->execute()) {
+            return true;  
+        } else {
+            return false; 
+        }
+    } catch (PDOException $e) {
+        error_log("Erreur lors de la mise à jour du cours : " . $e->getMessage());
+        return false;
+    }
+}
 
 
 }
@@ -356,7 +398,74 @@ class CoursDocument extends Cours {
         
         return $cours;
     }
-    
+    public function modifier() {
+        try {
+            $query = "UPDATE cours 
+                    SET nom_cours = :nom_cours,
+                        id_categorie = :id_categorie,
+                        type_contenu = :type_contenu,
+                        fichier = :fichier,
+                        images = :images,
+                        description = :description
+                    WHERE id_cours = :id_cours";
+            
+            $stmt = $this->conn->prepare($query);
+            
+            $stmt->bindParam(':nom_cours', $this->nom_cours);
+            $stmt->bindParam(':id_categorie', $this->id_categorie);
+            $stmt->bindParam(':type_contenu', $this->type_contenu);
+            $stmt->bindParam(':fichier', $this->fichier);
+            $stmt->bindParam(':images', $this->images);
+            $stmt->bindParam(':description', $this->description);
+            $stmt->bindParam(':id_cours', $this->id_cours);
+            
+            if ($stmt->execute()) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la mise à jour du cours : " . $e->getMessage());
+            return false;
+        }
+    }
+    public function updateTags($id_cours, $tags) {
+        global $conn; // Assurez-vous que la connexion est accessible
+
+        // D'abord, on supprime tous les tags existants pour ce cours
+        $sql = "DELETE FROM courstag WHERE id_cours = :id_cours";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id_cours', $id_cours);
+        $stmt->execute();
+
+        // Ensuite, on insère les nouveaux tags
+        foreach ($tags as $tag) {
+            // Récupérer l'ID du tag existant dans la table des tags
+            $sql = "SELECT id_tag FROM tag WHERE nom_tag = :nom_tag";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':nom_tag', $tag);
+            $stmt->execute();
+            $existingTag = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // Si le tag existe déjà, on récupère son ID, sinon on l'ajoute
+            if ($existingTag) {
+                $id_tag = $existingTag['id_tag'];
+            } else {
+                // Insertion du nouveau tag
+                $sql = "INSERT INTO tag (nom_tag) VALUES (:nom_tag)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':nom_tag', $tag);
+                $stmt->execute();
+                $id_tag = $conn->lastInsertId(); // Récupérer l'ID du tag ajouté
+            }
+
+            // Lier le tag au cours dans la table de liaison
+            $sql = "INSERT INTO courstag (id_cours, id_tag) VALUES (:id_cours, :id_tag)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id_cours', $id_cours);
+            $stmt->bindParam(':id_tag', $id_tag); // Passer l'ID du tag
+            $stmt->execute();
+        }
+    }
 
 }
 
@@ -425,7 +534,20 @@ class CoursVideo extends Cours {
         return $cours;
     }
     
-  
+    public function updateTags($id_cours, $tags) {
+        $query = "DELETE FROM courstag WHERE id_cours = :id_cours";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_cours', $id_cours);
+        $stmt->execute();
+        
+        foreach ($tags as $tag) {
+            $query = "INSERT INTO courstag (id_cours, id_tag) VALUES (:id_cours, :id_tag)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_cours', $id_cours);
+            $stmt->bindParam(':id_tag', $tag);
+            $stmt->execute();
+        }
+    }
  
     
 }
