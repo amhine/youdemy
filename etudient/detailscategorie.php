@@ -104,7 +104,7 @@
                             </a>
 
                             <!-- Bouton d'inscription -->
-                            <a href="./../etudient/inscription.php?id=<?= $cour->getIdCours() ?>">
+                            <a href="./../etudient/inscription.php ?id_cours=<?= $cour->getIdCours() ?>">
                                 <button class="px-6 py-2 border-2 border-purple-600 text-black font-bold bg-white rounded-full hover:bg-purple-600 hover:text-white hover:shadow-lg transform hover:scale-105 transition-all duration-300">
                                     Join Course
                                 </button>
