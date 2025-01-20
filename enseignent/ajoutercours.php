@@ -83,28 +83,25 @@ $categories = $categorie->getCategories();
     
 </div>
 <script>
-        // Fonction pour ajouter un nouvel input tag
-      // Fonction pour ajouter un nouvel input tag
       function ajouterTag() {
     var container = document.getElementById("tags-container");
     var newInput = document.createElement("input");
     newInput.type = "text";
-    newInput.name = "nom_tag[]";  // Utilisez le même nom que le premier champ
+    newInput.name = "nom_tag[]";  
     newInput.placeholder = "Entrez un tag";
     newInput.classList.add("appearance-none", "border", "border-gray-400", "rounded-lg", "w-full", "py-3", "px-4", "text-gray-700", "leading-tight", "focus:outline-none", "focus:ring-2", "focus:ring-blue-400", "focus:border-transparent", "mt-3");
     container.appendChild(newInput);
 }
 
 
-        // Fonction de validation avant l'envoi du formulaire
         function validateForm() {
             var inputs = document.querySelectorAll("input[name='nom_tag[]']");
             var isValid = true;
             
-            // Vérifier si tous les champs de tags sont remplis
+            
             inputs.forEach(function(input) {
                 if (input.value.trim() === "") {
-                    input.classList.add("border-red-500");  // Ajouter une bordure rouge pour indiquer l'erreur
+                    input.classList.add("border-red-500");  
                     isValid = false;
                 } else {
                     input.classList.remove("border-red-500");
