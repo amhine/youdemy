@@ -287,6 +287,8 @@ public static function getCoursById($pdo, $id_cours) {
     return null;
 }
 
+  
+
 
 
 }
@@ -325,6 +327,34 @@ class CoursDocument extends Cours {
     public function getfichier() {
         echo "<iframe src='" . $this->fichier . "' width='900' height='700'></iframe>";
 
+    }
+    public function getCoursInscrits($idUser) {
+        $query = "SELECT c.* FROM cours c 
+                  JOIN inscription i ON c.id_cours = i.id_cours 
+                  WHERE i.id_user = :id_user";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_user', $idUser);
+        $stmt->execute();
+        
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $cours = [];
+        foreach ($results as $row) {
+            $cours[] = new CoursDocument(
+                $this->conn, 
+                $row['id_cours'], 
+                $row['nom_cours'], 
+                $row['date_creation'], 
+                $row['id_categorie'], 
+                $row['id_user'], 
+                $row['statut'], 
+                $row['fichier'],
+                $row['images'],
+                $row['description']
+            );
+        }
+        
+        return $cours;
     }
     
 
@@ -366,7 +396,35 @@ class CoursVideo extends Cours {
         echo "<iframe width='900' height='500' src='" . $this->fichier . "' title='YouTube video player' frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' referrerpolicy='strict-origin-when-cross-origin' allowfullscreen></iframe>";
     }
     
-
+    public function getCoursInscrits($idUser) {
+        $query = "SELECT c.* FROM cours c 
+                  JOIN inscription i ON c.id_cours = i.id_cours 
+                  WHERE i.id_user = :id_user";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_user', $idUser);
+        $stmt->execute();
+        
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $cours = [];
+        foreach ($results as $row) {
+            $cours[] = new CoursVideo(
+                $this->conn, 
+                $row['id_cours'], 
+                $row['nom_cours'], 
+                $row['date_creation'], 
+                $row['id_categorie'], 
+                $row['id_user'], 
+                $row['statut'], 
+                $row['fichier'],
+                $row['images'],
+                $row['description']
+            );
+        }
+        
+        return $cours;
+    }
+    
   
  
     

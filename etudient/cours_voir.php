@@ -6,6 +6,7 @@ require './../classe/tag.php';
 
 $db = new Connexion();
 $connect = $db->getConnection();
+$pdo = $db->getConnection();
 $id_cours = isset($_GET['id_cours']) ? (int)$_GET['id_cours'] : null;
 
 if (!$id_cours) {
@@ -14,10 +15,10 @@ if (!$id_cours) {
 $coursDocument = new CoursDocument($db, null, null, null, null, null, null, null, null, null);
 $coursVideo = new CoursVideo($db, null, null, null, null, null, null, null, null, null);
 
-$cours = $coursDocument->getCoursById($conn, $id_cours);
+$cours = $coursDocument->getCoursById($pdo, $id_cours);
 
 if (!$cours) {
-    $cours = $coursVideo->getCoursById($conn, $id_cours);
+    $cours = $coursVideo->getCoursById($pdo, $id_cours);
 }
 
 if (!$cours) {
@@ -91,11 +92,11 @@ $tags = $tag->getTagsByCours($id_cours);
                 <?php endif; ?>
                 <!-- Bouton d'inscription -->
                 <div class="flex justify-end">
-                <a href="./../etudient/inscription.php?id=<?= $cours->getIdCours() ?>">
-                        <button class="px-6 py-2 border-2 border-purple-600 text-black font-bold bg-white rounded-full hover:bg-purple-600 hover:text-white hover:shadow-lg transform hover:scale-105 transition-all duration-300">
-                            Join Course
-                        </button>
-                    </a>
+                            <a href="./../etudient/inscription.php?id_cours=<?= $cours->getIdCours() ?>">
+                                <button class="px-6 py-2 border-2 border-purple-600 text-black font-bold bg-white rounded-full hover:bg-purple-600 hover:text-white hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+                                    Join Course
+                                </button>
+                            </a>
                 </div>
             </div>
         </div>
