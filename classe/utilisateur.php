@@ -22,9 +22,47 @@ class Utilisateur {
         $this->connect = (new Connexion())->getConnection();
     }
 
-    public function signup($nom, $email, $password, $role) {
-        $check_email = $this->connect->query("SELECT id_user FROM utilisateur WHERE email = '$email'");
-        if ($check_email->rowCount() > 0) {
+    public function getiduser(){
+        return $this->id_user;
+    }
+
+    public function setiduser($id_user){
+        $this->id_user=$id_user;
+    }
+
+    public function getnomuser(){
+        return $this->nom_user;
+    }
+    public function setnomuser($nom_user){
+        $this->nom_user->$nom_user;
+    }
+    public function getemail(){
+        return $this->email;
+    }
+    public function setemail($email){
+    $this->email->$email;
+    }
+
+    public function getpassword(){
+        return $this->password;
+    }
+    public function setpassword($password){
+    $this->password->$password;
+    }
+
+    public function getidrole(){
+        return $this->id_role;
+    }
+    public function setidrole($id_role){
+    $this->id_role->$id_role;
+    }
+
+   
+    public function signup($nom, $email, $password, $role, $status) {
+        $email = $this->connect->prepare("SELECT id_user FROM utilisateur WHERE email = ?");
+        $email->execute([$email]);
+        
+        if ($email->rowCount() > 0) {
             return "Cet email existe déjà";
         }
 
@@ -35,23 +73,29 @@ class Utilisateur {
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
         $date_creation = date('Y-m-d H:i:s');
 
-        $role_query = $this->connect->query("SELECT id_role FROM role WHERE nom_role = '$role'");
+        $role_query = $this->connect->prepare("SELECT id_role FROM role WHERE nom_role = ?");
+        $role_query->execute([$role]);
+        
         if ($role_query->rowCount() == 0) {
             return "Rôle non valide";
         }
 
         $role_id = $role_query->fetch(PDO::FETCH_ASSOC)['id_role'];
 
+        if ($role === 'Enseignant') {
+            $status = 'inactif';
+        }
+
         try {
-            $sql = "INSERT INTO utilisateur (nom_user, email, password, id_role, date_creation) 
-                    VALUES ('$nom', '$email', '$password_hash', '$role_id', '$date_creation')";
-            $this->connect->exec($sql); 
+            $sql = "INSERT INTO utilisateur (nom_user, email, password, id_role, date_creation, status) 
+                    VALUES (?, ?, ?, ?, ?, ?)";
+            $stmt = $this->connect->prepare($sql);
+            $stmt->execute([$nom, $email, $password_hash, $role_id, $date_creation, $status]);
             return "Inscription réussie";
         } catch(PDOException $e) {
             return "Erreur lors de l'inscription: " . $e->getMessage();
         }
     }
-
     public function connexion($email, $password) {
         try {
             $sql = "SELECT * FROM utilisateur WHERE email = '$email'";
@@ -85,41 +129,7 @@ class Utilisateur {
 
 
 
-    // public function afficherUtilisateurs() {
-    //     try {
-    //         $sql = "SELECT u.id_user, u.nom_user, r.nom_role 
-    //                 FROM utilisateur u
-    //                 INNER JOIN role r ON u.id_role = r.id_role";
-    //         $stmt = $this->connect->query($sql);
-    //         $utilisateurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-    //         $utilisateursObjets = []; 
-    
-    //         if ($utilisateurs) {
-    //             foreach ($utilisateurs as $utilisateur) {
-    //                 switch ($utilisateur['nom_role']) {
-    //                     case 'Étudiant':
-    //                         $utilisateursObjets[] = new Etudiant($this->connect, $utilisateur['id_user'], $utilisateur['nom_user'], '', '', '', '', '', '');
-    //                         break;
-    //                     case 'Enseignant':
-    //                         $utilisateursObjets[] = new Enseignant($this->connect, $utilisateur['id_user'], $utilisateur['nom_user'], '', '', '', '', '', '');
-    //                         break;
-    //                     default:
-                            
-    //                         break;
-    //                 }
-    //             }
-    //             return $utilisateursObjets; 
-    //         } else {
-    //             echo "Aucun utilisateur trouvé.";
-    //             return [];
-    //         }
-    //     } catch (PDOException $e) {
-    //         echo "Erreur lors de la récupération des utilisateurs : " . $e->getMessage();
-    //         return [];
-    //     }
-    // }
-    
+  
 
      public function afficherUtilisateurs() {
         $utilisateursObjets = [];
@@ -140,7 +150,7 @@ class Utilisateur {
                                 $utilisateur['id_user'],
                                 $utilisateur['nom_user'],
                                 $utilisateur['email'],
-                                null, // password
+                                null,
                                 $this->getIdRoleByNom('Étudiant'),
                                 $utilisateur['date_creation']
                             );
@@ -174,7 +184,11 @@ class Utilisateur {
         $stmt->execute([$nomRole]);
         return $stmt->fetchColumn();
     }
-    
+    public function getStatus() {
+        $stmt = $this->connect->prepare("SELECT status FROM utilisateur WHERE id_user = ?");
+        $stmt->execute([$this->id_user]);
+        return $stmt->fetchColumn();
+    }
     
     
 }
@@ -254,16 +268,33 @@ class Administrateur extends Utilisateur {
     public function __construct($id_user = null, $nom_user = null, $email = null, $password = null, $id_role = null, $date_creation = null) {
         parent::__construct($id_user, $nom_user, $email, $password, $id_role, $date_creation);
     }
-    public function gérerUtilisateur($id_utilisateur, $status) {
-        $stmt = $this->connect->prepare("UPDATE utilisateur SET status = ? WHERE id_user = ?");
-        $stmt->execute([$status, $id_utilisateur]);
-    }
+   
     public function getDetails() {
         $details = parent::getDetails();
         $details['role'] = 'admin';
         return $details;
     }
-}
 
+    public function supprimerUtilisateur($id_utilisateur) {
+        try {
+            $stmt = $this->connect->prepare("DELETE FROM utilisateur WHERE id_user = ?");
+            $stmt->execute([$id_utilisateur]);
+            return true;
+        } catch(PDOException $e) {
+            error_log("Erreur lors de la suppression de l'utilisateur : " . $e->getMessage());
+            return false;
+        }
+    }
+    public function gérerUtilisateur($id_utilisateur, $status) {
+        try {
+            $stmt = $this->connect->prepare("UPDATE utilisateur SET status = ? WHERE id_user = ?");
+            $stmt->execute([$status, $id_utilisateur]);
+            return true;
+        } catch(PDOException $e) {
+            error_log("Erreur lors de la mise à jour du status : " . $e->getMessage());
+            return false;
+        }
+}
+}
 
 ?>
