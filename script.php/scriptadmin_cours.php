@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if (empty($errors)) {
-                header("Location: ./../enseignent/courses.php");
+                header("Location: ./../admin/courses.php");
                 exit;
             }
         } else {
