@@ -69,8 +69,8 @@
             </div>
 
             <div class="bg-white rounded-xl shadow-lg p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <a href="ajouter-articledash.php" class="flex items-center text-gray-600 hover:text-indigo-800 py-4 transition-all duration-300 hover:translate-x-1">
-            <i class="fa-sharp-duotone fa-solid fa-book"> Ajouter Categorie</i>
+            <a href="categorie.php" class="flex items-center text-gray-600 hover:text-indigo-800 py-4 transition-all duration-300 hover:translate-x-1">
+            <i class="fa-sharp-duotone fa-solid fa-book"> les categories</i>
            
             </a>
                 
