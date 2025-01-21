@@ -75,6 +75,29 @@ class Categorie {
             return "Une erreur est survenue lors de l'ajout de la catégorie.";
         }
     }
+
+    public function supprimerCategorie($id_categorie) {
+        try {
+            if ($id_categorie) {
+                $sql = "DELETE FROM categorie WHERE id_categorie = :id_categorie";
+                $stmt = $this->connect->prepare($sql);
+                $stmt->bindParam(':id_categorie', $id_categorie, PDO::PARAM_INT);
+    
+                $stmt->execute();
+                if ($stmt->rowCount() > 0) {
+                    return "Catégorie supprimée avec succès.";
+                } else {
+                    return "Aucune catégorie trouvée à supprimer.";
+                }
+            } else {
+                return "L'ID de la catégorie est requis.";
+            }
+        } catch (PDOException $e) {
+            echo "Erreur lors de la suppression de la catégorie : " . $e->getMessage();
+            return "Une erreur est survenue lors de la suppression de la catégorie.";
+        }
+    }
+    
     
 }
 ?>
