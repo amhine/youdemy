@@ -48,7 +48,7 @@ $id_user_connected = $_SESSION['id_user'];
                     <a href="./../enseignent/home.php" class="text-gray-800 cursor-pointer hover:purple-800 px-3 py-2 rounded-md text-sm font-medium">Home</a>
                     <a href="./../enseignent/categorie.php" class="text-gray-600 cursor-pointer hover:purple-800 px-3 py-2 rounded-md text-sm font-medium">Categorier</a>
                     <a href="./../enseignent/courses.php" class="text-gray-600 hover:text-purple-800 px-3 py-2 rounded-md text-sm font-medium">Courses</a>
-                    <a href="./../enseignent/teacher.php" class="text-gray-600 hover:text-purple-800 px-3 py-2 rounded-md text-sm font-medium">Teacher</a>
+                    <a href="./../enseignent/statistique.php" class="text-gray-600 hover:text-purple-800 px-3 py-2 rounded-md text-sm font-medium">Statistiques</a>
                     <a href="./../authentification/login.php" class="text-white hover:text-purple-500 px-4 py-2 rounded bg-purple-600 hover:bg-purple-700">Logout</a>
                 </div>
             </div>
@@ -109,6 +109,11 @@ $id_user_connected = $_SESSION['id_user'];
                     <a href="modifiercours.php?id_cours=<?php echo $coursItem->getIdCours(); ?>">
                         <button class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700">
                             Modifier
+                        </button>
+                    </a>
+                    <a href="inscription.php?id_cours=<?php echo $coursItem->getIdCours(); ?>">
+                        <button class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700">
+                            Inscription
                         </button>
                     </a>
 
