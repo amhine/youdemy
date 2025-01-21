@@ -52,6 +52,7 @@ class Categorie {
             return [];
         }
     }
+    
 
     public function ajouterCategorie($nom_categorie, $description) {
         try {
@@ -97,7 +98,36 @@ class Categorie {
             return "Une erreur est survenue lors de la suppression de la catégorie.";
         }
     }
-    
+   
+   
+    public function updateCategorie($id_categorie, $nom_categorie, $description) {
+        try {
+            $sql =  "UPDATE categorie 
+            SET nom_categorie = :nom_categorie, 
+                description = :description 
+            WHERE id_categorie = :id_categorie";
+            $stmt = $this->connect->prepare($sql);
+            $stmt->bindParam(':id_categorie', $id_categorie);
+            $stmt->bindParam(':nom_categorie', $nom_categorie);
+            $stmt->bindParam(':description', $description);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            echo "Error updating category: " . $e->getMessage();
+        }
+    }
+    public function getCategorieById($id_categorie) {
+        try {
+            $sql = "SELECT * FROM categorie WHERE id_categorie = :id_categorie";
+            $stmt = $this->connect->prepare($sql);
+            $stmt->bindParam(':id_categorie', $id_categorie);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error retrieving category by ID: " . $e->getMessage();
+            return null;
+        }
+    }
+
     
 }
 ?>

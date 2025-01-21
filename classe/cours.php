@@ -353,6 +353,39 @@ public function getNombreEtudiantsInscrits() {
     return $result['nombre'];
 }
 
+
+
+
+public function getNombreTotalCours() {
+    try {
+        $sql = "SELECT COUNT(*) as total FROM cours";
+        $stmt = $this->conn->query($sql);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'];
+    } catch (PDOException $e) {
+        error_log("Erreur lors du comptage des cours: " . $e->getMessage());
+        return 0;
+    }
+}
+
+
+
+public function getCoursLePlusPopulaire() {
+    try {
+        $sql = "SELECT c.nom_cours, COUNT(i.id_inscription) as nombre_etudiants 
+               FROM cours c 
+               LEFT JOIN inscription i ON c.id_cours = i.id_cours 
+               GROUP BY c.id_cours, c.nom_cours 
+               ORDER BY nombre_etudiants DESC 
+               LIMIT 1";
+        $stmt = $this->conn->query($sql);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Erreur lors de la récupération du cours le plus populaire: " . $e->getMessage());
+        return null;
+    }
+}
+
 }
 class CoursDocument extends Cours {
     public function __construct($db, $id_cours, $nom_cours, $date_creation, $id_categorie, $id_user, $statut, $fichier, $images, $description) {
