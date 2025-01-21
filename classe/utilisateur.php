@@ -82,6 +82,101 @@ class Utilisateur {
             'id_role' => $this->id_role
         ];
     }
+
+
+
+    // public function afficherUtilisateurs() {
+    //     try {
+    //         $sql = "SELECT u.id_user, u.nom_user, r.nom_role 
+    //                 FROM utilisateur u
+    //                 INNER JOIN role r ON u.id_role = r.id_role";
+    //         $stmt = $this->connect->query($sql);
+    //         $utilisateurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+    //         $utilisateursObjets = []; 
+    
+    //         if ($utilisateurs) {
+    //             foreach ($utilisateurs as $utilisateur) {
+    //                 switch ($utilisateur['nom_role']) {
+    //                     case 'Étudiant':
+    //                         $utilisateursObjets[] = new Etudiant($this->connect, $utilisateur['id_user'], $utilisateur['nom_user'], '', '', '', '', '', '');
+    //                         break;
+    //                     case 'Enseignant':
+    //                         $utilisateursObjets[] = new Enseignant($this->connect, $utilisateur['id_user'], $utilisateur['nom_user'], '', '', '', '', '', '');
+    //                         break;
+    //                     default:
+                            
+    //                         break;
+    //                 }
+    //             }
+    //             return $utilisateursObjets; 
+    //         } else {
+    //             echo "Aucun utilisateur trouvé.";
+    //             return [];
+    //         }
+    //     } catch (PDOException $e) {
+    //         echo "Erreur lors de la récupération des utilisateurs : " . $e->getMessage();
+    //         return [];
+    //     }
+    // }
+    
+
+     public function afficherUtilisateurs() {
+        $utilisateursObjets = [];
+        
+        try {
+            $sql = "SELECT u.id_user, u.nom_user, u.email, u.date_creation, r.nom_role 
+                    FROM utilisateur u
+                    INNER JOIN role r ON u.id_role = r.id_role
+                    WHERE r.nom_role IN ('Étudiant', 'Enseignant')";
+            $stmt = $this->connect->query($sql);
+            $utilisateurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+            if ($utilisateurs) {
+                foreach ($utilisateurs as $utilisateur) {
+                    switch ($utilisateur['nom_role']) {
+                        case 'Étudiant':
+                            $etudiant = new Etudiant(
+                                $utilisateur['id_user'],
+                                $utilisateur['nom_user'],
+                                $utilisateur['email'],
+                                null, // password
+                                $this->getIdRoleByNom('Étudiant'),
+                                $utilisateur['date_creation']
+                            );
+                            $utilisateursObjets[] = $etudiant;
+                            break;
+    
+                        case 'Enseignant':
+                            $enseignant = new Enseignant(
+                                $utilisateur['id_user'],
+                                $utilisateur['nom_user'],
+                                $utilisateur['email'],
+                                null, // password
+                                $this->getIdRoleByNom('Enseignant'),
+                                $utilisateur['date_creation']
+                            );
+                            $utilisateursObjets[] = $enseignant;
+                            break;
+                    }
+                }
+            }
+    
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des utilisateurs : " . $e->getMessage();
+        }
+        
+        return $utilisateursObjets;
+    }
+
+    private function getIdRoleByNom($nomRole) {
+        $stmt = $this->connect->prepare("SELECT id_role FROM role WHERE nom_role = ?");
+        $stmt->execute([$nomRole]);
+        return $stmt->fetchColumn();
+    }
+    
+    
+    
 }
 
 
@@ -89,9 +184,14 @@ class Etudiant extends Utilisateur {
 
     protected $connect;
 
-    public function __construct($db, $id_user, $nom, $prenom, $email, $mot_de_passe, $role, $date_inscription, $id_cours) {
-        parent::__construct($db, $id_user, $nom, $prenom, $email, $mot_de_passe, $role, $date_inscription);
-        $this->connect = $db->getConnection();
+    public function __construct($id_user = null, $nom_user = null, $email = null, $password = null, $id_role = null, $date_creation = null) {
+        parent::__construct($id_user, $nom_user, $email, $password, $id_role, $date_creation);
+    }
+
+    public function getDetails() {
+        $details = parent::getDetails();
+        $details['role'] = 'Étudiant';
+        return $details;
     }
 
     public function voirCours() {
@@ -102,11 +202,7 @@ class Etudiant extends Utilisateur {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getDetails() {
-        $details = parent::getDetails();
-        $details['role'] = 'Étudiant';
-        return $details;
-    }
+    
 
     public function inscrireAuCours($id_user, $id_cours) {
         try {
@@ -132,6 +228,12 @@ class Etudiant extends Utilisateur {
 }
 
 class Enseignant extends Utilisateur {
+    public function __construct($id_user = null, $nom_user = null, $email = null, $password = null, $id_role = null, $date_creation = null) {
+        parent::__construct($id_user, $nom_user, $email, $password, $id_role, $date_creation);
+    }
+
+   
+    
     
     public function ajouterCours($titre, $description) {
         $stmt = $this->connect->prepare("INSERT INTO cours (titre, description, id_enseignant) 
@@ -148,6 +250,10 @@ class Enseignant extends Utilisateur {
 
 
 class Administrateur extends Utilisateur {
+
+    public function __construct($id_user = null, $nom_user = null, $email = null, $password = null, $id_role = null, $date_creation = null) {
+        parent::__construct($id_user, $nom_user, $email, $password, $id_role, $date_creation);
+    }
     public function gérerUtilisateur($id_utilisateur, $status) {
         $stmt = $this->connect->prepare("UPDATE utilisateur SET status = ? WHERE id_user = ?");
         $stmt->execute([$status, $id_utilisateur]);

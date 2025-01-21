@@ -331,7 +331,27 @@ public function modifier() {
         return false;
     }
 }
+public function getEtudiantsInscrits() {
+    $query = "SELECT u.nom_user 
+              FROM utilisateur u
+              JOIN inscription i ON u.id_user = i.id_user
+              WHERE i.id_cours = :id_cours";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':id_cours', $this->id_cours);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
+public function getNombreEtudiantsInscrits() {
+    $query = "SELECT COUNT(*) as nombre 
+              FROM inscription 
+              WHERE id_cours = :id_cours";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':id_cours', $this->id_cours);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result['nombre'];
+}
 
 }
 class CoursDocument extends Cours {
@@ -429,40 +449,31 @@ class CoursDocument extends Cours {
         }
     }
     public function updateTags($id_cours, $tags) {
-        global $conn; // Assurez-vous que la connexion est accessible
-
-        // D'abord, on supprime tous les tags existants pour ce cours
+        global $conn; 
         $sql = "DELETE FROM courstag WHERE id_cours = :id_cours";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':id_cours', $id_cours);
         $stmt->execute();
-
-        // Ensuite, on insère les nouveaux tags
         foreach ($tags as $tag) {
-            // Récupérer l'ID du tag existant dans la table des tags
             $sql = "SELECT id_tag FROM tag WHERE nom_tag = :nom_tag";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':nom_tag', $tag);
             $stmt->execute();
             $existingTag = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            // Si le tag existe déjà, on récupère son ID, sinon on l'ajoute
             if ($existingTag) {
                 $id_tag = $existingTag['id_tag'];
             } else {
-                // Insertion du nouveau tag
                 $sql = "INSERT INTO tag (nom_tag) VALUES (:nom_tag)";
                 $stmt = $conn->prepare($sql);
                 $stmt->bindParam(':nom_tag', $tag);
                 $stmt->execute();
-                $id_tag = $conn->lastInsertId(); // Récupérer l'ID du tag ajouté
+                $id_tag = $conn->lastInsertId();
             }
 
-            // Lier le tag au cours dans la table de liaison
             $sql = "INSERT INTO courstag (id_cours, id_tag) VALUES (:id_cours, :id_tag)";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_cours', $id_cours);
-            $stmt->bindParam(':id_tag', $id_tag); // Passer l'ID du tag
+            $stmt->bindParam(':id_tag', $id_tag); 
             $stmt->execute();
         }
     }

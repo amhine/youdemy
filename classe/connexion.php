@@ -18,5 +18,6 @@ class Connexion {
         }
         return $this->conn;
     }
+    
 }
 ?>
