@@ -1,28 +1,19 @@
 <?php
+include './../classe/connexion.php';
+require './../classe/utilisateur.php';
+require './../classe/cours.php'; 
+require './../classe/categorie.php';
 
-// include './conexion.php';
-// require './../class/utilisateur.php';
-// require './../class/categorier.php';
-// require './../class/vehicule.php';
-// require './../class/reservation.php';
-// require './../class/theme.php';
-// require './../class/article.php';
-// require './../class/tags.php';
+$db = new Connexion();
+$utilisateur = new Enseignant($db);
+$categorie = new Categorie($db, null, null);
 
-// $db = new Database();
-// $utilisateur = new Utilisateur($db);
-// $categorie = new Categorie($db); 
-// $theme = new Theme($db); 
-// $article = new Article($db); 
-// $themes = $theme->getTheme();
-// $categories = $categorie->getCategories();
-// $vehicule = new Vehicule($db); 
-// $vehicules = $vehicule->getvehicule();
-// $Reservation = new Reservation($db); 
-// $Reservations = $Reservation->getAllReservations();
-// $articles = $article->getArticle();
-// $tag = new Tag($db);
-// $tags= $tag ->getAll();
+$coursDocument = new CoursDocument($db, null, null, null, null, null, null, null, null, null);
+$coursVideo = new CoursVideo($db, null, null, null, null, null, null, null, null, null);
+
+$totalCours = $coursDocument->getNombreTotalCours(); 
+$coursPopulaire = $coursDocument->getCoursLePlusPopulaire(); 
+$topEnseignants = $utilisateur->getTopEnseignants(); 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -86,187 +77,36 @@
         <main class="flex-1 p-4">
             <div class="flex flex-col lg:flex-row gap-4 mb-6">
                 <div class="flex-1 bg-purple-700 border border-indigo-200 rounded-xl p-6 animate-fade-in h-32">
-                    <h2 class="text-sm md:text-xl text-white font-bold">Welcome Reservation</h2>
-                    <span class="text-sm md:text-xl text-white font-bold"><?php echo $Reservation->countReservation(); ?></span>
+                    <h2 class="text-sm md:text-xl text-white font-bold">Nombre total de cours</h2>
+                    <span class="text-sm md:text-xl text-white font-bold"><?php echo $totalCours; ?> cours</span>
+                </div>
+
+              
+            </div>
+            <div class="flex flex-col lg:flex-row gap-4 mb-6">
+                <div class="flex-1 bg-purple-700 border border-indigo-200 rounded-xl p-6 animate-fade-in h-32">
+                    <h2 class="text-sm md:text-xl text-white font-bold"> Le cour avec le plus d' étudiants</h2>
+                    <span class="text-sm md:text-xl text-white font-bold"> <?php 
+    if ($coursPopulaire) {
+        echo htmlspecialchars($coursPopulaire['nom_cours']) . 
+             ' (' . $coursPopulaire['nombre_etudiants'] . ' étudiants)';
+    }
+    ?></span>
                 </div>
 
                 <div class="flex-1 bg-purple-700 border border-blue-200 rounded-xl p-6 animate-fade-in">
-                    <h2 class="text-sm md:text-xl text-white font-bold">Clients inscrits</h2>
-                    <span class="text-sm md:text-xl text-white font-bold"><?php echo $utilisateur->countRole('User'); ?></span>
+                    <h2 class="text-sm md:text-xl text-white font-bold">Les Top 3 enseignants.</h2>
+                    <span class="text-sm md:text-xl text-white font-bold">  <?php 
+    foreach($topEnseignants as $index => $enseignant) {
+        echo ($index + 1) . '. ' . htmlspecialchars($enseignant['nom_user']) . 
+             ' (' . $enseignant['nombre_cours'] . ' cours)<br>';
+    }
+    ?></span>
                 </div>
+                
             </div>
 
-            <div class="reservations-container container mx-auto flex flex-col gap-8 py-8">
-                <!-- Categories Section -->
-                <div class="reservation-card bg-white border border-gray-300 rounded-lg shadow-lg p-6 hover:shadow-xl transition-transform transform hover:-translate-y-2">
-                    <h1 class="text-center text-4xl font-bold text-purple-700 mt-4 mb-4">Nouvelle categorier</h1>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <?php foreach ($categories as $cat): ?>
-                            <div class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105">
-                                <h3 class="text-lg font-bold text-gray-900 mb-2"><?php echo ($cat['nom']); ?></h3>
-                                <p class="text-sm text-gray-600 mb-4"><?php echo ($cat['description']); ?></p>
-                                <div class="mt-auto">
-                                    <img src="<?php echo ($cat['image']); ?>" alt="vehicle-type-<?php echo strtolower($cat['nom']); ?>" class="w-36 h-24 object-cover mx-auto">
-                                    <span class="mt-4 block text-blue-600 font-semibold hover:underline">Voir plus</span>
-                                </div>
-                                <div class="mt-4 flex gap-4">
-                                    <a href="modifier_categorie.php?id_categorie=<?php echo $cat['id_categorie']; ?>" class="text-white bg-yellow-500 rounded-lg px-4 py-2 hover:bg-yellow-600 transition-colors">
-                                        Modifier
-                                    </a>
-                                    <form action="supprimer_categorie.php" method="POST">
-                                        <input type="hidden" name="id_categorie" value="<?php echo $cat['id_categorie']; ?>">
-                                        <button type="submit" class="text-white bg-red-600 rounded-lg px-4 py-2 hover:bg-red-700 transition-colors">
-                                            Supprimer
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>  
-                    </div>
-                </div>
-
-                <!-- Vehicles Section -->
-                <div class="reservation-card bg-white border border-gray-300 rounded-lg shadow-lg p-6 hover:shadow-xl transition-transform transform hover:-translate-y-2">
-                    <h1 class="text-center text-4xl font-bold text-purple-700 mt-4 mb-4">Liste des cours</h1>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <?php foreach ($vehicules as $vehicule): ?>
-                            <div class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105">
-                                <img src="<?php echo ($vehicule['image']); ?>" alt="vehicle-<?php echo ($vehicule['marque']); ?>" class="w-36 h-24 object-cover mx-auto mb-4">
-                                <h3 class="text-lg font-bold text-gray-900 mb-2"><?php echo ($vehicule['marque'] . ' ' . $vehicule['madele']); ?></h3>
-                                <p class="text-sm text-gray-600 mb-4">Prix : <?php echo ($vehicule['prix']); ?> DH</p>
-                                <div class="mt-auto flex gap-4">
-                                    <a href="modifier_vehicule.php?id_vehicule=<?php echo $vehicule['id_vehicule']; ?>" class="text-white bg-yellow-500 rounded-lg px-4 py-2 hover:bg-yellow-600 transition-colors">
-                                        Modifier
-                                    </a>
-                                    <form action="supprimer_vehicule.php" method="POST">
-                                        <input type="hidden" name="id_vehicule" value="<?php echo $vehicule['id_vehicule']; ?>">
-                                        <button type="submit" class="text-white bg-red-600 rounded-lg px-4 py-2 hover:bg-red-700 transition-colors">
-                                            Supprimer
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-
-                <!-- Reservations Section -->
-                <div class="reservation-card bg-white border border-gray-300 rounded-lg shadow-lg p-6 hover:shadow-xl transition-transform transform hover:-translate-y-2">
-                    <h1 class="text-center text-4xl font-bold text-purple-700 mt-4 mb-4">Liste des tags</h1>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <?php foreach ($Reservations as $Reservation): ?>
-                            <div class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105">
-                                <h3 class="text-lg font-bold text-gray-900 mb-2"><?php echo ($Reservation['date']); ?></h3>
-                                <p class="text-sm text-gray-600 mb-4">Lieu : <?php echo ($Reservation['lieu']); ?></p>
-                                <p class="text-sm text-gray-600 mb-4">Prix : <?php echo ($Reservation['prix']); ?> DH</p>
-                                <div class="mt-auto flex gap-4">
-                                    <form action="supprimer_reservation.php" method="POST">
-                                        <input type="hidden" name="id_reservation" value="<?php echo $Reservation['id_reservation']; ?>">
-                                        <button type="submit" class="text-white bg-red-600 rounded-lg px-4 py-2 hover:bg-red-700 transition-colors">
-                                            Supprimer
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-
-                <!-- tags Section -->
-                <div class="reservation-card bg-white border border-gray-300 rounded-lg shadow-lg p-6 hover:shadow-xl transition-transform transform hover:-translate-y-2">
-                    <h1 class="text-center text-4xl font-bold text-purple-700 mt-4 mb-4">Liste des tags</h1>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <?php foreach ($tags as $tag): ?>
-                            <div class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105">
-                                <h3 class="text-lg font-bold text-gray-900 mb-2"><?php echo htmlspecialchars($tag['nom_tag']); ?></h3>
-                                
-                                <!-- Formulaire pour supprimer un tag -->
-                                 <div class="mt-auto flex gap-4">
-                                 <a href="modifier_tag.php?id_tag=<?php echo $tag['id_tag']; ?>" class="text-white bg-yellow-500 rounded-lg px-4 py-2 hover:bg-yellow-600 transition-colors">
-                                     Modifier
-                                </a>
-                                <form action="supprimer_tag.php" method="POST">
-                                    <input type="hidden" name="id_tag" value="<?php echo $tag['id_tag']; ?>">
-                                    <button type="submit" class="text-white bg-red-600 rounded-lg px-4 py-2 hover:bg-red-700 transition-colors">
-                                        Supprimer
-                                    </button>
-                                </form>
-
-                                 </div>
-                                
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-
-
-                <!-- Themes Section -->
-                <div class="reservation-card bg-white border border-gray-300 rounded-lg shadow-lg p-6 hover:shadow-xl transition-transform transform hover:-translate-y-2">
-                    <h1 class="text-center text-4xl font-bold text-purple-700 mt-4 mb-4">Liste des Thèmes</h1>
-                    <div class="flex flex-wrap justify-center mt-8 gap-10">
-                        <?php foreach ($themes as $cat): ?>
-                            <a href="theme_details.php?id_theme=<?php echo $cat['id_theme']; ?>" class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 transition-transform transform hover:scale-105 w-1 md:w-1/2 lg:w-1/3">
-                                <h3 class="text-lg font-bold text-blue-600 mb-2"><?php echo $cat['nom_theme']; ?></h3>
-                                <p class="text-sm text-gray-600 mb-4"><?php echo $cat['description']; ?></p>
-                                
-                                <span class="mt-4 block text-blue-600 font-semibold hover:underline">Voir plus</span>
-                            </a>
-                            <div class="mt-auto flex gap-4">
-                                <a href="modifier_theme.php?id_theme=<?php echo $cat['id_theme']; ?>" class="text-white bg-yellow-500 rounded-lg px-4 py-2 hover:bg-yellow-600 transition-colors">
-                                     Modifier
-                                </a>
-                                <form action="supprimer_theme.php" method="POST">
-                                    <input type="hidden" name="id_theme" value="<?php echo $cat['id_theme']; ?>">
-                                    <button type="submit" class="text-white bg-red-600 rounded-lg px-4 py-2 hover:bg-red-700 transition-colors">
-                                        Supprimer
-                                    </button>
-                                </form>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-
-
-                <!-- Articles Section -->
-                <div class="reservation-card bg-white border border-gray-300 rounded-lg shadow-lg p-6 hover:shadow-xl transition-transform transform hover:-translate-y-2">
-                    <h1 class="text-center text-4xl font-bold text-purple-700 mt-4 mb-4">Liste des articles</h1>
-                    <div id="vehicles-container" class="space-y-6" style="max-height: 500px; overflow-y: auto;">
-                        <?php foreach ($articles as $article): ?>
-                            <div class="flex flex-col items-center text-center">
-                                <h1 class="text-lg font-bold text-blue-600 mb-2"><?php echo ($article['titre']); ?></h1>
-                                <div class="flex flex-col items-start text-left w-full">
-                                    <img src="<?php echo ($article['image']); ?>" alt="article-<?php echo ($article['titre']); ?>" class="object-cover h-96 w-full md:w-3/4 lg:w-3/4 xl:w-1/3 p-4 mx-auto mb-4 rounded-lg">
-                                    <p class="text-sm text-gray-600 mb-4">Créé le : <?php echo ($article['date_creation']); ?></p>
-                                    <p class="text-sm text-gray-600 mb-4"><?php echo ($article['contrnue']); ?></p>
-                                    <div class="mt-auto flex gap-4">
-                                   
-                                        <form action="accepter-article.php" method="POST">
-                                            <input type="hidden" name="id_article" value="<?php echo $article['id_article']; ?>">
-                                            <button type="submit" class="text-white bg-red-600 rounded-lg px-4 py-2 hover:bg-red-700 transition-colors">
-                                                Accepter
-                                            </button>
-                                        </form>
-                                        
-                                        <a href="modifier_article.php?id_article=<?php echo $article['id_article']; ?>" class="text-white bg-yellow-500 rounded-lg px-4 py-2 hover:bg-yellow-600 transition-colors">
-                                            Modifier
-                                        </a>
-                                        <form action="supprimer_article.php" method="POST">
-                                            <input type="hidden" name="id_article" value="<?php echo $article['id_article']; ?>">
-                                            <button type="submit" class="text-white bg-red-600 rounded-lg px-4 py-2 hover:bg-red-700 transition-colors">
-                                                Supprimer
-                                            </button>
-                                        </form>
-                            
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-
-                <!-- tags Section -->
-
-            </div>
+            
         </main>
     </div>
 

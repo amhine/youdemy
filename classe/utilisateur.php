@@ -190,6 +190,23 @@ class Utilisateur {
         return $stmt->fetchColumn();
     }
     
+
+    public function countRole($roleName) {
+        $sql = "SELECT COUNT(*) AS role_count 
+                FROM utilisateur 
+                JOIN role ON utilisateur.id_role = role.id_role 
+                WHERE role.nom_role = :roleName AND role.nom_role != 'admin'";
+    
+        $stmt = $this->connect->prepare($sql);
+        $stmt->bindParam(':roleName', $roleName, PDO::PARAM_STR); 
+        $stmt->execute();
+    
+        if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            return $row['role_count']; 
+        }
+        return 0; 
+    }
+    
     
 }
 
@@ -258,6 +275,23 @@ class Enseignant extends Utilisateur {
         $details = parent::getDetails();
         $details['role'] = 'Enseignant';
         return $details;
+    }
+
+    public function getTopEnseignants() {
+        try {
+            $sql = "SELECT u.nom_user, COUNT(c.id_cours) as nombre_cours 
+                   FROM utilisateur u 
+                   JOIN cours c ON u.id_user = c.id_user 
+                   WHERE u.id_role = 3 
+                   GROUP BY u.id_user, u.nom_user 
+                   ORDER BY nombre_cours DESC 
+                   LIMIT 3";
+            $stmt = $this->connect->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la récupération des top enseignants: " . $e->getMessage());
+            return [];
+        }
     }
 }
 
