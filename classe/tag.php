@@ -112,7 +112,19 @@ class Tag {
         $stmt = $this->connect->prepare($query);
         $stmt->execute();
     }
-    
+    public function modifierTag($id_tag, $nom_tag) {
+        try {
+            $sql = "UPDATE tag SET nom_tag = :nom_tag WHERE id_tag = :id_tag";
+            $stmt = $this->connect->prepare($sql);
+            $stmt->bindParam(':id_tag', $id_tag, PDO::PARAM_INT);
+            $stmt->bindParam(':nom_tag', $nom_tag, PDO::PARAM_STR);
+            
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la modification du tag : " . $e->getMessage());
+            return false;
+        }
+    }
 }
 ?>
 
