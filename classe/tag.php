@@ -42,13 +42,7 @@ class Tag {
         return false;
     }
 
-    public function getAllTags() {
-        $query = "SELECT * FROM tag";
-        $stmt = $this->connect->prepare($query);
-        $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
-    }
 
     public function getTags() {
         try {
@@ -58,7 +52,7 @@ class Tag {
             $tags = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $tagObjects = [];
             foreach ($tags as $tag) {
-                $tagObjects[] = new tag($tag['nom_tag'],  $tag['id_tag']);
+                $tagObjects[] = new tag($tag['id_tag'],  $tag['nom_tag']);
             }
             return $tagObjects;
         } catch (PDOException $e) {
@@ -113,7 +107,11 @@ class Tag {
             return false;
         }
     }
-   
+    public function deletetag($id_tag) {
+        $query = "DELETE FROM `tag` WHERE id_tag = $id_tag";
+        $stmt = $this->connect->prepare($query);
+        $stmt->execute();
+    }
     
 }
 ?>
