@@ -53,16 +53,17 @@ class Categorie {
         }
     }
 
-    public function ajouterCategorie() {
+    public function ajouterCategorie($nom_categorie, $description) {
         try {
-            if ($this->nom_categorie && $this->description) {
+            if ($nom_categorie && $description) {
                 $sql = "INSERT INTO categorie (nom_categorie, description) VALUES (:nom_categorie, :description)";
                 $stmt = $this->connect->prepare($sql);
-                $stmt->bindParam(':nom_categorie', $this->nom_categorie);
-                $stmt->bindParam(':description', $this->description);
+                $stmt->bindParam(':nom_categorie', $nom_categorie);
+                $stmt->bindParam(':description', $description);
+    
                 $stmt->execute();
                 if ($stmt->rowCount() > 0) {
-                    return "Categorie ajoutée avec succès.";
+                    return "Catégorie ajoutée avec succès.";
                 } else {
                     return "Aucune catégorie ajoutée.";
                 }
@@ -70,9 +71,10 @@ class Categorie {
                 return "Nom et description sont requis.";
             }
         } catch (PDOException $e) {
-            echo "Error adding category: " . $e->getMessage();
+            echo "Erreur lors de l'ajout de la catégorie : " . $e->getMessage();
             return "Une erreur est survenue lors de l'ajout de la catégorie.";
         }
     }
+    
 }
 ?>
