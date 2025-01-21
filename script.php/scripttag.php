@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 echo $error . "<br>";
             }
         } else {
-            header("Location: dashbord.php");
+            header("Location: ./../admin/tags.php");
             exit();
         }
     } else {

@@ -74,8 +74,8 @@
            
             </a>
                 
-                <a href="ajout-theme.php" class="flex items-center text-gray-600 hover:text-indigo-800 py-4 transition-all duration-300 hover:translate-x-1">
-                <i class="fa-sharp-duotone fa-solid fa-book"> Ajouter tags</i>
+                <a href="tags.php" class="flex items-center text-gray-600 hover:text-indigo-800 py-4 transition-all duration-300 hover:translate-x-1">
+                <i class="fa-sharp-duotone fa-solid fa-book"> Les tags</i>
                 </a>
                 <a href="ajouter-tags.php.php" class="flex items-center text-gray-600 hover:text-indigo-800 py-4 transition-all duration-300 hover:translate-x-1">
                 <i class="fa-sharp-duotone fa-solid fa-book">Statistiques </i>

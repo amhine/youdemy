@@ -34,6 +34,11 @@ $cours = array_merge($coursDocument->getCours(), $coursVideo->getCours());
         <a href="ajoutercours.php" class="pt-1 text-white bg-purple-600 rounded-lg w-56 h-10 text-lg font-bold hover:bg-purple-700 transition-colors inline-block text-center">
             Ajouter Cours
         </a>
+        <a href="./../admin/dashbord.php ">
+                                <button class="px-6 py-2 border-2 border-purple-600 text-black font-bold bg-white rounded-full hover:bg-purple-600 hover:text-white hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+                                    Retourne dashbord
+                                </button>
+                     </a>
     </div>
 
    
