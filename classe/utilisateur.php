@@ -59,33 +59,33 @@ class Utilisateur {
 
    
     public function signup($nom, $email, $password, $role, $status) {
-        $email = $this->connect->prepare("SELECT id_user FROM utilisateur WHERE email = ?");
-        $email->execute([$email]);
+        $email_query = $this->connect->prepare("SELECT id_user FROM utilisateur WHERE email = ?");
+        $email_query->execute([$email]);
         
-        if ($email->rowCount() > 0) {
+        if ($email_query->rowCount() > 0) {
             return "Cet email existe déjà";
         }
-
+    
         if (strlen($password) < 6) {
             return "Le mot de passe doit contenir au moins 6 caractères";
         }
-
+    
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
         $date_creation = date('Y-m-d H:i:s');
-
+    
         $role_query = $this->connect->prepare("SELECT id_role FROM role WHERE nom_role = ?");
         $role_query->execute([$role]);
         
         if ($role_query->rowCount() == 0) {
             return "Rôle non valide";
         }
-
+    
         $role_id = $role_query->fetch(PDO::FETCH_ASSOC)['id_role'];
-
+    
         if ($role === 'Enseignant') {
             $status = 'inactif';
         }
-
+    
         try {
             $sql = "INSERT INTO utilisateur (nom_user, email, password, id_role, date_creation, status) 
                     VALUES (?, ?, ?, ?, ?, ?)";
@@ -96,6 +96,7 @@ class Utilisateur {
             return "Erreur lors de l'inscription: " . $e->getMessage();
         }
     }
+    
     public function connexion($email, $password) {
         try {
             $sql = "SELECT * FROM utilisateur WHERE email = '$email'";

@@ -295,42 +295,42 @@ public function deletecours($id_cours) {
     $stmt = $this->conn->prepare($query);
     $stmt->execute();
 }
-public function modifier() {
-    try {
-        $query = "UPDATE cours 
-                  SET nom_cours = :nom_cours, 
-                      date_creation = :date_creation, 
-                      id_categorie = :id_categorie, 
-                      id_user = :id_user, 
-                      statut = :statut, 
-                      type_contenu = :type_contenu, 
-                      fichier = :fichier, 
-                      images = :images, 
-                      description = :description
-                  WHERE id_cours = :id_cours";
-        $stmt = $this->conn->prepare($query);
+// public function modifier() {
+//     try {
+//         $query = "UPDATE cours 
+//                   SET nom_cours = :nom_cours, 
+//                       date_creation = :date_creation, 
+//                       id_categorie = :id_categorie, 
+//                       id_user = :id_user, 
+//                       statut = :statut, 
+//                       type_contenu = :type_contenu, 
+//                       fichier = :fichier, 
+//                       images = :images, 
+//                       description = :description
+//                   WHERE id_cours = :id_cours";
+//         $stmt = $this->conn->prepare($query);
         
-        $stmt->bindParam(':nom_cours', $this->nom_cours);
-        $stmt->bindParam(':date_creation', $this->date_creation);
-        $stmt->bindParam(':id_categorie', $this->id_categorie);
-        $stmt->bindParam(':id_user', $this->id_user);
-        $stmt->bindParam(':statut', $this->statut);
-        $stmt->bindParam(':type_contenu', $this->type_contenu);
-        $stmt->bindParam(':fichier', $this->fichier);
-        $stmt->bindParam(':images', $this->images);
-        $stmt->bindParam(':description', $this->description);
-        $stmt->bindParam(':id_cours', $this->id_cours);
+//         $stmt->bindParam(':nom_cours', $this->nom_cours);
+//         $stmt->bindParam(':date_creation', $this->date_creation);
+//         $stmt->bindParam(':id_categorie', $this->id_categorie);
+//         $stmt->bindParam(':id_user', $this->id_user);
+//         $stmt->bindParam(':statut', $this->statut);
+//         $stmt->bindParam(':type_contenu', $this->type_contenu);
+//         $stmt->bindParam(':fichier', $this->fichier);
+//         $stmt->bindParam(':images', $this->images);
+//         $stmt->bindParam(':description', $this->description);
+//         $stmt->bindParam(':id_cours', $this->id_cours);
         
-        if ($stmt->execute()) {
-            return true;  
-        } else {
-            return false; 
-        }
-    } catch (PDOException $e) {
-        error_log("Erreur lors de la mise à jour du cours : " . $e->getMessage());
-        return false;
-    }
-}
+//         if ($stmt->execute()) {
+//             return true;  
+//         } else {
+//             return false; 
+//         }
+//     } catch (PDOException $e) {
+//         error_log("Erreur lors de la mise à jour du cours : " . $e->getMessage());
+//         return false;
+//     }
+// }
 public function getEtudiantsInscrits() {
     $query = "SELECT u.nom_user 
               FROM utilisateur u
@@ -385,7 +385,33 @@ public function getCoursLePlusPopulaire() {
         return null;
     }
 }
-
+public function modifier() {
+    try {
+        $query = "UPDATE cours 
+                SET nom_cours = :nom_cours,
+                    id_categorie = :id_categorie,
+                    type_contenu = :type_contenu,
+                    fichier = :fichier,
+                    images = :images,
+                    description = :description
+                WHERE id_cours = :id_cours";
+        
+        $stmt = $this->conn->prepare($query);
+        
+        $stmt->bindParam(':nom_cours', $this->nom_cours);
+        $stmt->bindParam(':id_categorie', $this->id_categorie);
+        $stmt->bindParam(':type_contenu', $this->type_contenu);
+        $stmt->bindParam(':fichier', $this->fichier);
+        $stmt->bindParam(':images', $this->images);
+        $stmt->bindParam(':description', $this->description);
+        $stmt->bindParam(':id_cours', $this->id_cours);
+        
+        return $stmt->execute();
+    } catch (PDOException $e) {
+        error_log("Erreur lors de la mise à jour du cours : " . $e->getMessage());
+        return false;
+    }
+}
 }
 class CoursDocument extends Cours {
     public function __construct($db, $id_cours, $nom_cours, $date_creation, $id_categorie, $id_user, $statut, $fichier, $images, $description) {
@@ -451,36 +477,36 @@ class CoursDocument extends Cours {
         
         return $cours;
     }
-    public function modifier() {
-        try {
-            $query = "UPDATE cours 
-                    SET nom_cours = :nom_cours,
-                        id_categorie = :id_categorie,
-                        type_contenu = :type_contenu,
-                        fichier = :fichier,
-                        images = :images,
-                        description = :description
-                    WHERE id_cours = :id_cours";
+    // public function modifier() {
+    //     try {
+    //         $query = "UPDATE cours 
+    //                 SET nom_cours = :nom_cours,
+    //                     id_categorie = :id_categorie,
+    //                     type_contenu = :type_contenu,
+    //                     fichier = :fichier,
+    //                     images = :images,
+    //                     description = :description
+    //                 WHERE id_cours = :id_cours";
             
-            $stmt = $this->conn->prepare($query);
+    //         $stmt = $this->conn->prepare($query);
             
-            $stmt->bindParam(':nom_cours', $this->nom_cours);
-            $stmt->bindParam(':id_categorie', $this->id_categorie);
-            $stmt->bindParam(':type_contenu', $this->type_contenu);
-            $stmt->bindParam(':fichier', $this->fichier);
-            $stmt->bindParam(':images', $this->images);
-            $stmt->bindParam(':description', $this->description);
-            $stmt->bindParam(':id_cours', $this->id_cours);
+    //         $stmt->bindParam(':nom_cours', $this->nom_cours);
+    //         $stmt->bindParam(':id_categorie', $this->id_categorie);
+    //         $stmt->bindParam(':type_contenu', $this->type_contenu);
+    //         $stmt->bindParam(':fichier', $this->fichier);
+    //         $stmt->bindParam(':images', $this->images);
+    //         $stmt->bindParam(':description', $this->description);
+    //         $stmt->bindParam(':id_cours', $this->id_cours);
             
-            if ($stmt->execute()) {
-                return true;
-            }
-            return false;
-        } catch (PDOException $e) {
-            error_log("Erreur lors de la mise à jour du cours : " . $e->getMessage());
-            return false;
-        }
-    }
+    //         if ($stmt->execute()) {
+    //             return true;
+    //         }
+    //         return false;
+    //     } catch (PDOException $e) {
+    //         error_log("Erreur lors de la mise à jour du cours : " . $e->getMessage());
+    //         return false;
+    //     }
+    // }
     public function updateTags($id_cours, $tags) {
         global $conn; 
         $sql = "DELETE FROM courstag WHERE id_cours = :id_cours";
@@ -592,11 +618,39 @@ class CoursVideo extends Cours {
             $stmt->execute();
         }
     }
- 
+    // public function modifier() {
+    //     try {
+    //         $query = "UPDATE cours 
+    //                 SET nom_cours = :nom_cours,
+    //                     id_categorie = :id_categorie,
+    //                     type_contenu = :type_contenu,
+    //                     fichier = :fichier,
+    //                     images = :images,
+    //                     description = :description
+    //                 WHERE id_cours = :id_cours";
+            
+    //         $stmt = $this->conn->prepare($query);
+            
+    //         $stmt->bindParam(':nom_cours', $this->nom_cours);
+    //         $stmt->bindParam(':id_categorie', $this->id_categorie);
+    //         $stmt->bindParam(':type_contenu', $this->type_contenu);
+    //         $stmt->bindParam(':fichier', $this->fichier);
+    //         $stmt->bindParam(':images', $this->images);
+    //         $stmt->bindParam(':description', $this->description);
+    //         $stmt->bindParam(':id_cours', $this->id_cours);
+            
+    //         if ($stmt->execute()) {
+    //             return true;
+    //         }
+    //         return false;
+    //     } catch (PDOException $e) {
+    //         error_log("Erreur lors de la mise à jour du cours : " . $e->getMessage());
+    //         return false;
+    //     }
+    // }
     
 }
 ?>
-
 
 
 
